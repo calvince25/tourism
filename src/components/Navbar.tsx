@@ -10,11 +10,14 @@ export default function Navbar() {
         Wildpath<span className="text-accent">Africa</span>
       </div>
       
-      <div className="hidden md:flex items-center gap-8">
-        <Link href="#about" className="text-sm font-medium hover:text-accent transition-colors text-white">About</Link>
-        <Link href="#destination" className="text-sm font-medium hover:text-accent transition-colors text-white">Destination</Link>
-        <Link href="#tours" className="text-sm font-medium hover:text-accent transition-colors text-white">Exclusive Tour</Link>
-        <Link href="#reviews" className="text-sm font-medium hover:text-accent transition-colors text-white">Reviews</Link>
+      <div className="hidden md:flex items-center gap-6">
+        <Link href="/" className="text-sm font-medium hover:text-accent transition-colors text-white">Home</Link>
+        <Link href="/about" className="text-sm font-medium hover:text-accent transition-colors text-white">About</Link>
+        <Link href="/destinations" className="text-sm font-medium hover:text-accent transition-colors text-white">Destinations</Link>
+        <Link href="/tours" className="text-sm font-medium hover:text-accent transition-colors text-white">Tours</Link>
+        <Link href="/blog" className="text-sm font-medium hover:text-accent transition-colors text-white">Blog</Link>
+        <Link href="/faq" className="text-sm font-medium hover:text-accent transition-colors text-white">FAQ</Link>
+        <Link href="/contact" className="text-sm font-medium hover:text-accent transition-colors text-white">Contact</Link>
       </div>
 
       <div className="flex items-center gap-4 text-white">

@@ -94,7 +94,7 @@ export default function ContactPage() {
               <div className="pt-10 border-t border-white/5">
                 <h4 className="font-bold mb-6 uppercase tracking-widest text-xs text-white/40">Chat with a Specialist</h4>
                 <a 
-                  href="https://wa.me/254700000000"
+                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20chat%20about%20planning%20a%20safari.`}
                   className="inline-flex items-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-transform"
                 >
                   <MessageCircle size={24} />
@@ -136,11 +136,11 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   >
-                    <option value="Safari Inquiry">Safari Inquiry</option>
-                    <option value="Beach Holiday">Beach Holiday</option>
-                    <option value="Custom Itinerary">Custom Itinerary</option>
-                    <option value="Corporate Travel">Corporate Travel</option>
-                    <option value="Other">Other</option>
+                    <option className="bg-navy text-white" value="Safari Inquiry">Safari Inquiry</option>
+                    <option className="bg-navy text-white" value="Beach Holiday">Beach Holiday</option>
+                    <option className="bg-navy text-white" value="Custom Itinerary">Custom Itinerary</option>
+                    <option className="bg-navy text-white" value="Corporate Travel">Corporate Travel</option>
+                    <option className="bg-navy text-white" value="Other">Other</option>
                   </select>
                 </div>
 

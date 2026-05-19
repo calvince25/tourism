@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function WhatsAppButton() {
   return (
     <Link
-      href="https://wa.me/254700000000?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20enquire%20about%20a%20safari."
+      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20enquire%20about%20a%20safari.`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform group"

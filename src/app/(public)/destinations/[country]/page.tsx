@@ -104,7 +104,7 @@ export default async function CountryDestinationsPage({ params }: Props) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {country.destinations.map(dest => (
+            {country.destinations.map((dest: any) => (
               <DestinationCard key={dest.id} destination={dest} countrySlug={country.slug} />
             ))}
           </div>

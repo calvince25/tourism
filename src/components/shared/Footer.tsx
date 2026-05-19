@@ -63,7 +63,7 @@ export default function Footer() {
               </li>
               <li className="flex gap-3">
                 <span className="text-accent">📞</span>
-                +254 700 000 000
+                +254 704 059 438
               </li>
               <li className="flex gap-3">
                 <span className="text-accent">📧</span>
@@ -71,7 +71,7 @@ export default function Footer() {
               </li>
             </ul>
             <Link 
-              href="https://wa.me/254700000000" 
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20chat%20about%20your%20safari%20packages.`} 
               className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-bold text-sm hover:scale-105 transition-transform"
             >
               <MessageCircle size={18} />

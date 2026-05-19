@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ToursIndexPage() {
-  let tours = [];
+  let tours: any[] = [];
   try {
     tours = await prisma.tour.findMany({
       where: { status: "PUBLISHED" },
@@ -27,7 +27,8 @@ export default async function ToursIndexPage() {
         shortDescription: "Experience the best of Kenya's wildlife in one unforgettable week.",
         priceUsd: 1800,
         durationDays: 7,
-        travelStyle: "Safari"
+        travelStyle: "Safari",
+        coverImage: { fileUrl: "/assets/placeholder.png" }
       },
       {
         id: "mock-2",
@@ -36,7 +37,8 @@ export default async function ToursIndexPage() {
         shortDescription: "Witness the eighth wonder of the world: the Great Migration.",
         priceUsd: 2200,
         durationDays: 5,
-        travelStyle: "Safari"
+        travelStyle: "Safari",
+        coverImage: { fileUrl: "/assets/placeholder.png" }
       }
     ];
   }

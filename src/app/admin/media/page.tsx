@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import MediaUploader from "@/components/admin/MediaUploader";
 import Image from "next/image";
-import { Trash2, Edit3, ExternalLink, Search } from "lucide-react";
+import { Trash2, Edit3, ExternalLink, Search, Download } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 const categories = ["All", "Hero", "Destinations", "Tours", "Blog", "General"];
@@ -116,9 +116,14 @@ export default function MediaLibraryPage() {
                 />
                 <div className="absolute inset-0 bg-navy/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
                   <div className="flex gap-2">
-                    <button className="p-2 bg-white/10 rounded-lg hover:bg-accent hover:text-navy transition-all" title="Edit details">
-                      <Edit3 size={16} />
-                    </button>
+                    <a 
+                      href={item.fileUrl} 
+                      download={item.originalName || item.filename || "download"}
+                      className="p-2 bg-white/10 rounded-lg hover:bg-accent hover:text-navy transition-all" 
+                      title="Download image"
+                    >
+                      <Download size={16} />
+                    </a>
                     <button 
                       onClick={() => handleDelete(item.id)}
                       className="p-2 bg-white/10 rounded-lg hover:bg-red-500 transition-all" 

@@ -9,21 +9,22 @@ import {
 } from "lucide-react";
 
 export default async function AdminDashboard() {
-  const [
-    destCount,
-    tourCount,
-    blogCount,
-    userCount,
-    pendingUsers,
-    inquiryCount
-  ] = await Promise.all([
-    prisma.destination.count(),
-    prisma.tour.count(),
-    prisma.blogPost.count(),
-    prisma.user.count(),
-    prisma.user.count({ where: { status: 'PENDING' } }),
-    prisma.bookingInquiry.count({ where: { status: 'NEW' } })
-  ]);
+  let destCount = 0, tourCount = 0, blogCount = 0, userCount = 0, pendingUsers = 0, inquiryCount = 0;
+
+  try {
+    const counts = await Promise.all([
+      prisma.destination.count(),
+      prisma.tour.count(),
+      prisma.blogPost.count(),
+      prisma.user.count(),
+      prisma.user.count({ where: { status: 'PENDING' } }),
+      prisma.bookingInquiry.count({ where: { status: 'NEW' } })
+    ]);
+    
+    [destCount, tourCount, blogCount, userCount, pendingUsers, inquiryCount] = counts;
+  } catch (error) {
+    console.error("Database connection failed, using 0 for dashboard stats.");
+  }
 
   const stats = [
     { name: "Destinations", value: destCount, icon: MapPin, color: "text-blue-400" },

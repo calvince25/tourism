@@ -131,7 +131,7 @@ export default async function DestinationDetailPage({ params }: Props) {
               <div className="prose prose-invert max-w-none">
                 <h2 className="text-4xl font-bold font-outfit text-white mb-8 border-l-4 border-accent pl-6">Introduction</h2>
                 <div className="text-white/70 text-lg leading-relaxed space-y-6">
-                  {dest.contentIntro?.split('\n').map((p, i) => (
+                  {dest.contentIntro?.split('\n').map((p: string, i: number) => (
                     <p key={i}>{p}</p>
                   ))}
                 </div>
@@ -166,7 +166,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                 <div>
                   <h2 className="text-3xl font-bold font-outfit mb-8">Destination Gallery</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {dest.gallery.map((item, i) => (
+                    {dest.gallery.map((item: any, i: number) => (
                       <div key={i} className="relative h-64 rounded-2xl overflow-hidden group">
                         <Image
                           src={item.media.fileUrl}
@@ -185,7 +185,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                 <div className="space-y-8">
                   <h2 className="text-3xl font-bold font-outfit">Frequently Asked Questions</h2>
                   <div className="space-y-4">
-                    {dest.faqs.map((faq, i) => (
+                    {dest.faqs.map((faq: any, i: number) => (
                       <details key={i} className="group bg-navy-light/10 border border-white/5 rounded-2xl p-6">
                         <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center group-open:text-accent transition-colors">
                           {faq.question}

@@ -9,15 +9,32 @@ export async function POST(req: Request) {
 
   try {
     const data = await req.json()
+    const { faqs, attractions, ...rest } = data
     
     // Calculate word count
-    const combinedContent = (data.contentIntro || "") + (data.contentWhyVisit || "") + (data.contentWildlife || "") + (data.contentCulture || "")
-    const wordCount = combinedContent.replace(/<[^>]*>/g, " ").trim().split(/\s+/).filter(w => w.length > 0).length
+    const combinedContent = (rest.contentIntro || "") + (rest.contentWhyVisit || "") + (rest.contentWildlife || "") + (rest.contentCulture || "")
+    const wordCount = combinedContent.replace(/<[^>]*>/g, " ").trim().split(/\s+/).filter((w: string) => w.length > 0).length
 
     const destination = await prisma.destination.create({
       data: {
-        ...data,
-        totalWordCount: wordCount
+        ...rest,
+        totalWordCount: wordCount,
+        faqs: faqs ? {
+          create: faqs.map((f: any) => ({
+            question: f.question,
+            answer: f.answer,
+            sortOrder: f.sortOrder || 0
+          }))
+        } : undefined,
+        attractions: attractions ? {
+          create: attractions.map((a: any) => ({
+            name: a.name,
+            description: a.description,
+            attractionType: a.attractionType || "Wildlife",
+            photoId: a.photoId || null,
+            sortOrder: a.sortOrder || 0
+          }))
+        } : undefined
       }
     })
 
@@ -33,21 +50,44 @@ export async function PUT(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { id, ...data } = await req.json()
+    const { id, faqs, attractions, ...rest } = await req.json()
     
-    const combinedContent = (data.contentIntro || "") + (data.contentWhyVisit || "") + (data.contentWildlife || "") + (data.contentCulture || "")
-    const wordCount = combinedContent.replace(/<[^>]*>/g, " ").trim().split(/\s+/).filter(w => w.length > 0).length
+    const combinedContent = (rest.contentIntro || "") + (rest.contentWhyVisit || "") + (rest.contentWildlife || "") + (rest.contentCulture || "")
+    const wordCount = combinedContent.replace(/<[^>]*>/g, " ").trim().split(/\s+/).filter((w: string) => w.length > 0).length
+
+    // Run delete and update in a transaction
+    await prisma.$transaction([
+      prisma.destinationFaq.deleteMany({ where: { destinationId: id } }),
+      prisma.attraction.deleteMany({ where: { destinationId: id } }),
+    ])
 
     const destination = await prisma.destination.update({
       where: { id },
       data: {
-        ...data,
-        totalWordCount: wordCount
+        ...rest,
+        totalWordCount: wordCount,
+        faqs: faqs ? {
+          create: faqs.map((f: any) => ({
+            question: f.question,
+            answer: f.answer,
+            sortOrder: f.sortOrder || 0
+          }))
+        } : undefined,
+        attractions: attractions ? {
+          create: attractions.map((a: any) => ({
+            name: a.name,
+            description: a.description,
+            attractionType: a.attractionType || "Wildlife",
+            photoId: a.photoId || null,
+            sortOrder: a.sortOrder || 0
+          }))
+        } : undefined
       }
     })
 
     return NextResponse.json(destination)
   } catch (error: any) {
+    console.error("API Error:", error)
     return NextResponse.json({ error: error.message || 'Update failed' }, { status: 500 })
   }
 }

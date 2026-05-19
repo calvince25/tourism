@@ -13,7 +13,8 @@ import {
   MessageCircle, 
   ArrowLeft,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Zap
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -174,7 +175,7 @@ export default async function TourDetailPage({ params }: Props) {
                 <div className="space-y-12">
                   <h2 className="text-4xl font-bold font-outfit">Detailed Itinerary</h2>
                   <div className="space-y-8 relative before:absolute before:left-8 before:top-4 before:bottom-4 before:w-px before:bg-white/5">
-                    {tour.itinerary.map((day) => (
+                    {tour.itinerary.map((day: any) => (
                       <div key={day.id} className="relative pl-24 group">
                         <div className="absolute left-0 top-0 w-16 h-16 rounded-2xl bg-navy-light flex flex-col items-center justify-center border border-white/10 group-hover:border-accent transition-colors z-20">
                           <span className="text-[10px] font-bold uppercase text-white/40">Day</span>
@@ -265,7 +266,7 @@ export default async function TourDetailPage({ params }: Props) {
                       Check Availability
                     </button>
                     <Link 
-                      href="https://wa.me/254700000000"
+                      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20enquire%20about%20the%20${encodeURIComponent(tour.name)}%20package.`}
                       className="w-full bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#25D366]/20 transition-all"
                     >
                       <MessageCircle size={20} /> Chat with Specialist
