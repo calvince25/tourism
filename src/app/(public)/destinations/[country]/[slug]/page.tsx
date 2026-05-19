@@ -6,6 +6,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import FadeIn from '@/components/animations/FadeIn'
 import { Calendar, MapPin, Clock, Globe, Shield, Zap, TrendingUp } from 'lucide-react'
+import { generateSEOMetadata } from '@/lib/seo'
+import JsonLd from '@/components/shared/JsonLd'
+import BookingButton from '@/components/shared/BookingButton'
 
 interface Props { params: { country: string; slug: string } }
 
@@ -25,21 +28,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   if (!destination) return {}
 
-  const canonical = `https://wildpathafrica.co.ke/destinations/${destination.country.slug}/${destination.slug}/`
-
-  return {
-    title: destination.metaTitle || `${destination.name} | WildpathAfrica`,
-    description: destination.metaDescription || destination.shortTeaser || '',
-    alternates: { canonical },
-    openGraph: {
-      title: destination.metaTitle || destination.name,
-      description: destination.metaDescription || '',
-      url: canonical,
-      siteName: 'WildpathAfrica',
-      images: destination.ogImage ? [{ url: destination.ogImage.fileUrl, width: 1200, height: 630 }] : [],
-      type: 'website',
-    },
-  }
+  return generateSEOMetadata({
+    title: destination.metaTitle || destination.name,
+    description: destination.metaDescription || destination.shortTeaser || `Explore ${destination.name} in ${destination.country.name} with WildpathAfrica.`,
+    path: `/destinations/${destination.country.slug}/${destination.slug}`,
+    ogImage: destination.ogImage?.fileUrl,
+  });
 }
 
 export default async function DestinationDetailPage({ params }: Props) {
@@ -76,8 +70,28 @@ export default async function DestinationDetailPage({ params }: Props) {
 
   if (!dest || dest.country.slug !== params.country) notFound()
 
+  const breadcrumbs = [
+    { name: "Home", item: "/" },
+    { name: "Destinations", item: "/destinations" },
+    { name: dest.name, item: `/destinations/${dest.country.slug}/${dest.slug}` },
+  ];
+
   return (
     <div className="min-h-screen bg-navy text-white">
+      <JsonLd type="breadcrumb" data={{ items: breadcrumbs }} />
+      <JsonLd 
+        type="localBusiness" 
+        data={{
+          name: dest.name,
+          description: dest.contentIntro || "African tourism destination.",
+          url: `https://wildpathafrica.co.ke/destinations/${dest.country.slug}/${dest.slug}`,
+          addressLocality: dest.name,
+          addressCountry: "KE"
+        }} 
+      />
+      {dest.faqs && dest.faqs.length > 0 && (
+        <JsonLd type="faq" data={{ faqs: dest.faqs }} />
+      )}
       <Navbar />
 
       {/* Hero Section */}
@@ -222,9 +236,13 @@ export default async function DestinationDetailPage({ params }: Props) {
                     </span>
                   </div>
                 </div>
-                <button className="w-full bg-accent text-navy font-bold py-4 rounded-xl hover:scale-105 transition-transform">
+                <BookingButton
+                  destinationId={dest.id}
+                  itemName={dest.name}
+                  className="w-full bg-accent text-navy font-bold py-4 rounded-xl hover:scale-105 transition-transform"
+                >
                   Request a Quote
-                </button>
+                </BookingButton>
               </div>
             </div>
           </div>

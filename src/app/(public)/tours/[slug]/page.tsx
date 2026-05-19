@@ -17,6 +17,9 @@ import {
   Zap
 } from "lucide-react";
 import type { Metadata } from "next";
+import { generateSEOMetadata } from "@/lib/seo";
+import JsonLd from "@/components/shared/JsonLd";
+import BookingButton from "@/components/shared/BookingButton";
 
 interface Props { params: { slug: string } }
 
@@ -32,14 +35,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   if (!tour) return {};
 
-  return {
-    title: tour.metaTitle || `${tour.name} | WildpathAfrica`,
-    description: tour.metaDescription || tour.shortDescription || "",
-    openGraph: {
-      title: tour.metaTitle || tour.name,
-      images: tour.ogImage ? [{ url: tour.ogImage.fileUrl }] : [],
-    },
-  };
+  return generateSEOMetadata({
+    title: tour.metaTitle || tour.name,
+    description: tour.metaDescription || tour.shortDescription || `Embark on the ${tour.name} with WildpathAfrica.`,
+    path: `/tours/${tour.slug}`,
+    ogImage: tour.ogImage?.fileUrl,
+  });
 }
 
 export default async function TourDetailPage({ params }: Props) {
@@ -85,8 +86,26 @@ export default async function TourDetailPage({ params }: Props) {
 
   if (!tour || (tour.status !== "PUBLISHED" && tour.id !== "mock-tour")) notFound();
 
+  const breadcrumbs = [
+    { name: "Home", item: "/" },
+    { name: "Tours", item: "/tours" },
+    { name: tour.name, item: `/tours/${tour.slug}` },
+  ];
+
   return (
     <div className="min-h-screen bg-navy text-white">
+      <JsonLd type="breadcrumb" data={{ items: breadcrumbs }} />
+      <JsonLd 
+        type="service" 
+        data={{ 
+          name: tour.name, 
+          description: tour.shortDescription || "Safari tour package.", 
+          serviceType: "Safari Tour" 
+        }} 
+      />
+      {tour.faqs && tour.faqs.length > 0 && (
+        <JsonLd type="faq" data={{ faqs: tour.faqs }} />
+      )}
       <Navbar />
 
       {/* Hero */}
@@ -262,9 +281,13 @@ export default async function TourDetailPage({ params }: Props) {
                   </div>
 
                   <div className="space-y-4">
-                    <button className="w-full bg-accent text-navy font-bold py-5 rounded-2xl hover:scale-105 active:scale-95 transition-all text-lg shadow-lg shadow-accent/20">
+                    <BookingButton
+                      tourId={tour.id}
+                      itemName={tour.name}
+                      className="w-full bg-accent text-navy font-bold py-5 rounded-2xl hover:scale-105 active:scale-95 transition-all text-lg shadow-lg shadow-accent/20"
+                    >
                       Check Availability
-                    </button>
+                    </BookingButton>
                     <Link 
                       href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20enquire%20about%20the%20${encodeURIComponent(tour.name)}%20package.`}
                       className="w-full bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#25D366]/20 transition-all"

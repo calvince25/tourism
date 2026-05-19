@@ -19,14 +19,26 @@ export async function POST(req: Request) {
     }
 
     const results = []
+    const MAX_SIZE = 5 * 1024 * 1024 // 5MB limit
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
     for (const file of files) {
+      if (file.size > MAX_SIZE) {
+        return NextResponse.json({ error: `File size exceeds the 5MB limit (${file.name})` }, { status: 400 })
+      }
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        return NextResponse.json({ error: `Invalid file type. Only JPEG, PNG, WEBP, and GIF are allowed.` }, { status: 400 })
+      }
+
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)
 
-      // Generate slug filename
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-      const slug = file.name.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      // Generate slug filename securely
+      const slug = file.name
+        .replace(/\.[^/.]+$/, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .substring(0, 50)
       const datePath = new Date().toISOString().slice(0, 7).replace('-', '/')
       const dir = path.join(process.cwd(), 'public', 'uploads', datePath)
 

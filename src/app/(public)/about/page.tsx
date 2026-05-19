@@ -1,11 +1,14 @@
 import Navbar from "@/components/Navbar";
 import { Shield, Zap, TrendingUp, Users, Heart, Globe } from "lucide-react";
 import type { Metadata } from "next";
+import { generateSEOMetadata } from "@/lib/seo";
+import JsonLd from "@/components/shared/JsonLd";
 
-export const metadata: Metadata = {
-  title: "About Us | WildpathAfrica - Our Story & Values",
+export const metadata: Metadata = generateSEOMetadata({
+  title: "About Us - Our Story & Values",
   description: "Learn about WildpathAfrica's mission, values, and our commitment to sustainable tourism and community empowerment in Kenya.",
-};
+  path: "/about",
+});
 
 const values = [
   { 
@@ -29,8 +32,14 @@ const values = [
 ];
 
 export default function AboutPage() {
+  const breadcrumbItems = [
+    { name: "Home", item: "/" },
+    { name: "About Us", item: "/about" },
+  ];
+
   return (
     <div className="min-h-screen bg-navy">
+      <JsonLd type="breadcrumb" data={{ items: breadcrumbItems }} />
       <Navbar />
 
       {/* Hero */}

@@ -81,7 +81,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
-          <p>© {new Date().getFullYear()} WildpathAfrica. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} WildpathAfrica. All rights reserved. Designed by <a href="https://www.growthlab.co.ke" target="_blank" rel="noopener noreferrer" className="hover:text-accent font-bold transition-colors">GrowthLab Limited</a>.</p>
           <div className="flex gap-6">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>

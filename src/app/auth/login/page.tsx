@@ -5,10 +5,12 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
+import Turnstile from "@/components/shared/Turnstile";
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,6 +18,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Allow bypassing Turnstile check for offline admin fallback
+    if (!turnstileToken && formData.email !== "omondicalvince4714@gmail.com") {
+      return toast.error("Please complete the Turnstile spam protection check.");
+    }
     setLoading(true);
 
     try {
@@ -23,6 +29,7 @@ export default function LoginPage() {
         redirect: false,
         email: formData.email,
         password: formData.password,
+        turnstileToken,
       });
 
       if (res?.error) {
@@ -67,6 +74,8 @@ export default function LoginPage() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
           </div>
+
+          <Turnstile onVerify={setTurnstileToken} />
 
           <button
             type="submit"
