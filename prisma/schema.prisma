@@ -1,0 +1,452 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USERS ───────────────────────────────────────────────────────
+model User {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  emailVerified  DateTime?
+  password       String
+  role           Role      @default(PENDING)
+  status         UserStatus @default(PENDING)
+  isFirstAdmin   Boolean   @default(false)
+  phone          String?
+  profilePhotoId String?
+  profilePhoto   Media?    @relation("UserPhoto", fields: [profilePhotoId], references: [id])
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  blogPosts      BlogPost[]
+  uploadedMedia  Media[]   @relation("Uploader")
+  reviews        Review[]
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  PENDING
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+}
+
+// ─── COUNTRIES (destination tabs) ────────────────────────────────
+model Country {
+  id           String        @id @default(cuid())
+  name         String        @unique        // "Kenya", "New Zealand", "France"
+  slug         String        @unique        // "kenya", "new-zealand", "france"
+  continent    String                        // "Africa", "Oceania", "Europe"
+  flagEmoji    String?                       // "🇰🇪"
+  coverImageId String?
+  coverImage   Media?        @relation("CountryCover", fields: [coverImageId], references: [id])
+  sortOrder    Int           @default(0)
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+
+  destinations Destination[]
+}
+
+// ─── DESTINATIONS ─────────────────────────────────────────────────
+model Destination {
+  id            String      @id @default(cuid())
+  name          String
+  slug          String      @unique           // "maasai-mara"
+  countryId     String
+  country       Country     @relation(fields: [countryId], references: [id])
+
+  shortTeaser   String?     @db.VarChar(200)  // For index cards
+
+  // Rich content
+  contentIntro        String?   @db.Text
+  contentWhyVisit     String?   @db.Text
+  contentBestTime     String?   @db.Text
+  contentWildlife     String?   @db.Text
+  contentCulture      String?   @db.Text
+  contentGettingThere String?   @db.Text
+  contentAccommodation String?  @db.Text
+  contentTravelTips   String?   @db.Text
+  totalWordCount      Int       @default(0)
+
+  // SEO
+  metaTitle       String?   @db.VarChar(65)
+  metaDescription String?   @db.VarChar(165)
+  focusKeyword    String?
+  secondaryKeywords Json?                     // ["keyword1","keyword2"]
+  canonicalUrl    String?
+  ogImageId       String?
+  ogImage         Media?    @relation("DestOgImage", fields: [ogImageId], references: [id])
+  schemaJson      Json?                       // Custom JSON-LD override
+
+  // At a glance
+  language          String?
+  currency          String?
+  timezone          String?
+  visaRequired      Boolean?
+  visaNotes         String?
+  bestSeason        String?
+  avgTempRange      String?
+  parkEntryResident String?
+  parkEntryNonResident String?
+
+  // Media
+  heroImageId      String?
+  heroImage        Media?   @relation("DestHero", fields: [heroImageId], references: [id])
+  thumbnailImageId String?
+  thumbnailImage   Media?   @relation("DestThumb", fields: [thumbnailImageId], references: [id])
+
+  status    DestinationStatus @default(DRAFT)
+  sortOrder Int               @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  attractions   Attraction[]
+  gallery       DestinationGallery[]
+  faqs          DestinationFaq[]
+  tours         TourDestination[]
+  reviews       Review[]
+}
+
+enum DestinationStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Attraction {
+  id            String      @id @default(cuid())
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?     @db.Text
+  photoId       String?
+  photo         Media?      @relation("AttractionPhoto", fields: [photoId], references: [id])
+  attractionType String?    // "Wildlife" | "Marine" | "Cultural" | "Viewpoint" | "Adventure"
+  gpsLat        Float?
+  gpsLng        Float?
+  sortOrder     Int         @default(0)
+}
+
+model DestinationGallery {
+  id            String      @id @default(cuid())
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  mediaId       String
+  media         Media       @relation(fields: [mediaId], references: [id])
+  sortOrder     Int         @default(0)
+
+  @@unique([destinationId, mediaId])
+}
+
+model DestinationFaq {
+  id            String      @id @default(cuid())
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  question      String      @db.Text
+  answer        String      @db.Text
+  sortOrder     Int         @default(0)
+}
+
+// ─── TOURS ────────────────────────────────────────────────────────
+model Tour {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  shortDescription String?  @db.VarChar(300)
+  fullDescription  String?  @db.Text
+  priceKes         Int?
+  priceUsd         Int?
+  durationDays     Int
+  durationNights   Int?
+  groupSizeMin     Int      @default(1)
+  groupSizeMax     Int      @default(16)
+  difficulty       TourDifficulty @default(MODERATE)
+  travelStyle      String?          // "Safari" | "Beach" | "Mountain" | "Cultural" | "Family"
+  included         Json?
+  notIncluded      Json?
+  highlights       Json?            // 6 bullet strings
+  coverImageId     String?
+  coverImage       Media?   @relation("TourCover", fields: [coverImageId], references: [id])
+  heroImageId      String?
+  heroImage        Media?   @relation("TourHero", fields: [heroImageId], references: [id])
+  metaTitle        String?  @db.VarChar(65)
+  metaDescription  String?  @db.VarChar(165)
+  focusKeyword     String?
+  ogImageId        String?
+  ogImage          Media?   @relation("TourOgImage", fields: [ogImageId], references: [id])
+  schemaJson       Json?
+  status           TourStatus @default(DRAFT)
+  featured         Boolean    @default(false)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  destinations TourDestination[]
+  itinerary    TourItineraryDay[]
+  departures   TourDeparture[]
+  gallery      TourGallery[]
+  reviews      Review[]
+  faqs         TourFaq[]
+}
+
+enum TourDifficulty {
+  EASY
+  MODERATE
+  CHALLENGING
+}
+enum TourStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model TourDestination {
+  tourId        String
+  tour          Tour        @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+  sortOrder     Int         @default(0)
+  @@id([tourId, destinationId])
+}
+
+model TourItineraryDay {
+  id               String  @id @default(cuid())
+  tourId           String
+  tour             Tour    @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  dayNumber        Int
+  title            String
+  description      String? @db.Text
+  location         String?
+  photoId          String?
+  photo            Media?  @relation("ItineraryPhoto", fields: [photoId], references: [id])
+  mealsIncluded    String?
+  accommodation    String?
+  sortOrder        Int     @default(0)
+}
+
+model TourDeparture {
+  id              String          @id @default(cuid())
+  tourId          String
+  tour            Tour            @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  departureDate   DateTime
+  returnDate      DateTime
+  availableSlots  Int
+  bookedSlots     Int             @default(0)
+  priceOverrideKes Int?
+  status          DepartureStatus @default(AVAILABLE)
+}
+
+enum DepartureStatus {
+  AVAILABLE
+  LIMITED
+  FULL
+  CANCELLED
+}
+
+model TourGallery {
+  id        String @id @default(cuid())
+  tourId    String
+  tour      Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     Media  @relation(fields: [mediaId], references: [id])
+  sortOrder Int    @default(0)
+  @@unique([tourId, mediaId])
+}
+
+model TourFaq {
+  id        String @id @default(cuid())
+  tourId    String
+  tour      Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  question  String @db.Text
+  answer    String @db.Text
+  sortOrder Int    @default(0)
+}
+
+// ─── MEDIA ────────────────────────────────────────────────────────
+model Media {
+  id           String   @id @default(cuid())
+  filename     String                    // stored filename slug
+  originalName String?                   // original upload filename
+  filePath     String                    // relative path: /uploads/2026/05/image.webp
+  fileUrl      String                    // public URL
+  thumbnailUrl String?                   // 320px
+  mediumUrl    String?                   // 800px
+  largeUrl     String?                   // 1920px
+  altText      String?
+  title        String?
+  caption      String?
+  category     String?                   // Hero | Destinations | Tours | Blog | Team | General
+  assignedSlots Json?                    // ["dest.maasai-mara.hero","tour.kenya-safari.cover"]
+  fileType     String?
+  fileSize     Int?
+  width        Int?
+  height       Int?
+  uploadedById String?
+  uploadedBy   User?    @relation("Uploader", fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  // reverse relations
+  userPhotos          User[]              @relation("UserPhoto")
+  countryCoverImages  Country[]           @relation("CountryCover")
+  destHeroImages      Destination[]       @relation("DestHero")
+  destThumbs          Destination[]       @relation("DestThumb")
+  destOgImages        Destination[]       @relation("DestOgImage")
+  attractions         Attraction[]        @relation("AttractionPhoto")
+  destGalleries       DestinationGallery[]
+  tourCovers          Tour[]              @relation("TourCover")
+  tourHeroes          Tour[]              @relation("TourHero")
+  tourOgImages        Tour[]              @relation("TourOgImage")
+  itineraryPhotos     TourItineraryDay[]  @relation("ItineraryPhoto")
+  tourGalleries       TourGallery[]
+  blogFeaturedImages  BlogPost[]          @relation("BlogFeatured")
+  blogOgImages        BlogPost[]          @relation("BlogOgImage")
+}
+
+// ─── BLOG ─────────────────────────────────────────────────────────
+model BlogPost {
+  id              String     @id @default(cuid())
+  title           String
+  slug            String     @unique
+  excerpt         String?    @db.Text
+  content         String     @db.Text       // HTML from TipTap
+  featuredImageId String?
+  featuredImage   Media?     @relation("BlogFeatured", fields: [featuredImageId], references: [id])
+  authorId        String?
+  author          User?      @relation(fields: [authorId], references: [id])
+  category        String?
+  tags            Json?
+  metaTitle       String?    @db.VarChar(65)
+  metaDescription String?    @db.VarChar(165)
+  ogImageId       String?
+  ogImage         Media?     @relation("BlogOgImage", fields: [ogImageId], references: [id])
+  schemaJson      Json?
+  status          BlogStatus @default(DRAFT)
+  featured        Boolean    @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ─── FAQs ─────────────────────────────────────────────────────────
+model Faq {
+  id        String    @id @default(cuid())
+  question  String    @db.Text
+  answer    String    @db.Text
+  category  String                    // "Booking" | "Payment" | "Visas" | "Safety" etc.
+  sortOrder Int       @default(0)
+  status    FaqStatus @default(ACTIVE)
+}
+
+enum FaqStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// ─── REVIEWS ──────────────────────────────────────────────────────
+model Review {
+  id              String       @id @default(cuid())
+  travellerName   String
+  travellerEmail  String?
+  travellerCountry String?
+  avatarUrl       String?
+  destinationId   String?
+  destination     Destination? @relation(fields: [destinationId], references: [id])
+  tourId          String?
+  tour            Tour?        @relation(fields: [tourId], references: [id])
+  userId          String?
+  user            User?        @relation(fields: [userId], references: [id])
+  rating          Int
+  reviewText      String       @db.Text
+  status          ReviewStatus @default(PENDING)
+  featured        Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ─── CONTACT & BOOKINGS ───────────────────────────────────────────
+model ContactSubmission {
+  id                  String   @id @default(cuid())
+  name                String
+  email               String
+  phone               String?
+  destinationInterest String?
+  message             String   @db.Text
+  status              ContactStatus @default(NEW)
+  createdAt            DateTime @default(now())
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+}
+
+model BookingInquiry {
+  id                   String        @id @default(cuid())
+  tourId               String?
+  destinationId        String?
+  name                 String
+  email                String
+  phone                String?
+  whatsapp             String?
+  travelDate           DateTime?
+  travelersAdults      Int           @default(1)
+  travelersChildren    Int           @default(0)
+  budgetRange          String?
+  accommodationPref    String?
+  specialRequirements  String?       @db.Text
+  status               InquiryStatus @default(NEW)
+  createdAt            DateTime      @default(now())
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  BOOKED
+  CANCELLED
+}
+
+model NewsletterSubscriber {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String?
+  status         SubscriberStatus @default(ACTIVE)
+  subscribedAt   DateTime         @default(now())
+  unsubscribedAt DateTime?
+}
+
+enum SubscriberStatus {
+  ACTIVE
+  UNSUBSCRIBED
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String?  @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt
+}
