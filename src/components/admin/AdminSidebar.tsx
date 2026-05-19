@@ -13,7 +13,8 @@ import {
   Star, 
   Mail, 
   Settings,
-  Globe
+  Globe,
+  X
 } from "lucide-react";
 
 const menuItems = [
@@ -30,16 +31,35 @@ const menuItems = [
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+  mobileOnClose?: () => void;
+}
+
+export default function AdminSidebar({ mobileOnClose }: AdminSidebarProps) {
   const pathname = usePathname();
 
+  const handleLinkClick = () => {
+    if (mobileOnClose) {
+      mobileOnClose();
+    }
+  };
+
   return (
-    <aside className="w-64 bg-navy-deep border-r border-white/5 flex flex-col h-screen sticky top-0">
-      <div className="p-8 border-b border-white/5">
-        <Link href="/admin" className="text-xl font-bold font-outfit text-white">
+    <aside className="w-full bg-navy-deep flex flex-col h-full overflow-hidden">
+      <div className="p-6 sm:p-8 border-b border-white/5 flex items-center justify-between">
+        <Link href="/admin" onClick={handleLinkClick} className="text-xl font-bold font-outfit text-white">
           Wildpath<span className="text-accent">Africa</span>
           <span className="block text-[10px] text-white/40 uppercase tracking-widest mt-1">Admin Panel</span>
         </Link>
+        {mobileOnClose && (
+          <button
+            onClick={mobileOnClose}
+            className="lg:hidden p-2 text-white/60 hover:text-white rounded-lg hover:bg-white/5 transition-all"
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       <nav className="flex-grow p-4 space-y-1 overflow-y-auto">
@@ -51,6 +71,7 @@ export default function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={handleLinkClick}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
                 isActive 
                   ? "bg-accent/10 text-accent border-l-4 border-accent" 
@@ -67,6 +88,7 @@ export default function AdminSidebar() {
       <div className="p-4 border-t border-white/5">
         <Link 
           href="/"
+          onClick={handleLinkClick}
           className="flex items-center gap-3 px-4 py-3 text-white/40 hover:text-white transition-all text-sm"
         >
           <Globe size={18} />

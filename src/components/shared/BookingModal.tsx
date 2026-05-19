@@ -87,16 +87,16 @@ export default function BookingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-navy-dark/80 backdrop-blur-md" onClick={onClose} />
 
       {/* Modal Box */}
-      <div className="relative w-full max-w-2xl bg-navy-light/90 border border-white/10 rounded-[32px] overflow-hidden max-h-[90vh] flex flex-col shadow-2xl animate-fade-in">
+      <div className="relative w-full sm:max-w-2xl bg-navy-light/90 sm:bg-navy-light/90 border-0 sm:border border-white/10 rounded-t-[28px] sm:rounded-[32px] overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-white/5 bg-navy-dark/40">
           <div>
-            <h3 className="text-xl font-bold font-outfit text-white">Request a Quote</h3>
+            <h3 className="text-lg sm:text-xl font-bold font-outfit text-white">Request a Quote</h3>
             <p className="text-xs text-white/50">Inquiry for: <span className="text-accent font-bold">{itemName}</span></p>
           </div>
           <button
@@ -108,7 +108,7 @@ export default function BookingModal({
         </div>
 
         {/* Scrollable Form */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Full Name *</label>

@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminTopbar from "@/components/admin/AdminTopbar";
+import AdminLayoutShell from "@/components/admin/AdminLayoutShell";
 import AuthProvider from "@/components/AuthProvider";
 
 export default async function AdminLayout({
@@ -22,15 +21,9 @@ export default async function AdminLayout({
 
   return (
     <AuthProvider>
-      <div className="flex min-h-screen bg-navy text-white">
-        <AdminSidebar />
-        <div className="flex-grow flex flex-col">
-          <AdminTopbar />
-          <main className="p-10 flex-grow">
-            {children}
-          </main>
-        </div>
-      </div>
+      <AdminLayoutShell>
+        {children}
+      </AdminLayoutShell>
     </AuthProvider>
   );
 }

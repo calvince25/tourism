@@ -164,20 +164,20 @@ export default async function TourDetailPage({ params }: Props) {
       </section>
 
       {/* Main Content */}
-      <section className="py-24">
-        <div className="container mx-auto px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-            <div className="lg:col-span-8 space-y-20">
+      <section className="py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+            <div className="lg:col-span-8 space-y-12 sm:space-y-20">
               {/* Overview */}
               <div className="prose prose-invert max-w-none">
-                <h2 className="text-4xl font-bold font-outfit text-white mb-8 border-l-4 border-accent pl-6">Tour Overview</h2>
-                <div className="text-white/70 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: tour.fullDescription || "" }} />
+                <h2 className="text-2xl sm:text-4xl font-bold font-outfit text-white mb-6 sm:mb-8 border-l-4 border-accent pl-4 sm:pl-6">Tour Overview</h2>
+                <div className="text-white/70 text-base sm:text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: tour.fullDescription || "" }} />
               </div>
 
               {/* Highlights */}
               {tour.highlights && (
-                <div className="bg-navy-light/20 border border-white/5 rounded-[40px] p-10 md:p-16">
-                  <h3 className="text-3xl font-bold font-outfit mb-10">Experience Highlights</h3>
+                <div className="bg-navy-light/20 border border-white/5 rounded-2xl sm:rounded-[40px] p-6 sm:p-10 md:p-16">
+                  <h3 className="text-2xl sm:text-3xl font-bold font-outfit mb-6 sm:mb-10">Experience Highlights</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {(tour.highlights as string[]).map((item, i) => (
                       <div key={i} className="flex items-start gap-4">
@@ -251,8 +251,8 @@ export default async function TourDetailPage({ params }: Props) {
 
             {/* Sticky Booking Sidebar */}
             <div className="lg:col-span-4">
-              <div className="sticky top-32 space-y-8">
-                <div className="bg-navy-light/30 border border-accent/20 rounded-[40px] p-10 backdrop-blur-xl shadow-2xl overflow-hidden relative">
+              <div className="lg:sticky lg:top-32 space-y-6 sm:space-y-8">
+                <div className="bg-navy-light/30 border border-accent/20 rounded-2xl sm:rounded-[40px] p-6 sm:p-10 backdrop-blur-xl shadow-2xl overflow-hidden relative">
                   <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                     <Zap size={120} className="text-accent" />
                   </div>
