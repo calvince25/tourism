@@ -33,7 +33,11 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        toast.error("Invalid email or password");
+        if (res.error === "CredentialsSignin") {
+          toast.error("Invalid email or password");
+        } else {
+          toast.error(res.error);
+        }
       } else {
         toast.success("Welcome back!");
         router.push("/admin");

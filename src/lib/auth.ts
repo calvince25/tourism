@@ -1,11 +1,9 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
     maxAge: 30 * 60, // Enforce session logout after 30 minutes of inactivity
@@ -64,6 +62,14 @@ export const authOptions: NextAuthOptions = {
           const valid = await bcrypt.compare(credentials.password, user.password);
           if (!valid) return null;
 
+          if (user.status === "PENDING" || user.role === "PENDING") {
+            throw new Error("Your account is pending authorization from the administrator. Please wait.");
+          }
+
+          if (user.status === "SUSPENDED") {
+            throw new Error("Your account has been suspended.");
+          }
+
           return {
             id: user.id,
             name: user.name,
@@ -71,7 +77,10 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
             status: user.status,
           };
-        } catch (error) {
+        } catch (error: any) {
+          if (error instanceof Error && (error.message.includes("pending") || error.message.includes("suspended"))) {
+            throw error;
+          }
           console.error("Auth DB connection error:", error);
           return null;
         }
