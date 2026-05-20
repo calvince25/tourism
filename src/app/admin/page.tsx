@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import { 
   MapPin, 
   Plane, 
@@ -27,10 +28,10 @@ export default async function AdminDashboard() {
   }
 
   const stats = [
-    { name: "Destinations", value: destCount, icon: MapPin, color: "text-blue-400" },
-    { name: "Tours", value: tourCount, icon: Plane, color: "text-green-400" },
-    { name: "Blog Posts", value: blogCount, icon: FileText, color: "text-purple-400" },
-    { name: "Total Users", value: userCount, icon: UsersIcon, color: "text-orange-400" },
+    { name: "Destinations", value: destCount, icon: MapPin, color: "text-blue-400", href: "/admin/destinations" },
+    { name: "Tours", value: tourCount, icon: Plane, color: "text-green-400", href: "/admin/tours" },
+    { name: "Blog Posts", value: blogCount, icon: FileText, color: "text-purple-400", href: "/admin/blog" },
+    { name: "Total Users", value: userCount, icon: UsersIcon, color: "text-orange-400", href: "/admin/users" },
   ];
 
   return (
@@ -44,22 +45,32 @@ export default async function AdminDashboard() {
       {(pendingUsers > 0 || inquiryCount > 0) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {pendingUsers > 0 && (
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-6 flex items-center justify-between">
+            <Link 
+              href="/admin/users"
+              className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-6 flex items-center justify-between hover:bg-orange-500/20 hover:border-orange-500/30 transition-all group block"
+            >
               <div>
                 <h4 className="text-orange-400 font-bold mb-1">Pending Approvals</h4>
                 <p className="text-sm text-white/60">{pendingUsers} users are awaiting access approval.</p>
               </div>
-              <button className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-bold">Review</button>
-            </div>
+              <span className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-bold group-hover:scale-105 transition-transform block">
+                Review
+              </span>
+            </Link>
           )}
           {inquiryCount > 0 && (
-            <div className="bg-accent/10 border border-accent/20 rounded-2xl p-6 flex items-center justify-between">
+            <Link 
+              href="/admin/inquiries"
+              className="bg-accent/10 border border-accent/20 rounded-2xl p-6 flex items-center justify-between hover:bg-accent/20 hover:border-accent/30 transition-all group block"
+            >
               <div>
                 <h4 className="text-accent font-bold mb-1">New Inquiries</h4>
                 <p className="text-sm text-white/60">You have {inquiryCount} new booking inquiries.</p>
               </div>
-              <button className="bg-accent text-navy px-4 py-2 rounded-xl text-sm font-bold">View</button>
-            </div>
+              <span className="bg-accent text-navy px-4 py-2 rounded-xl text-sm font-bold group-hover:scale-105 transition-transform block">
+                View
+              </span>
+            </Link>
           )}
         </div>
       )}
@@ -67,15 +78,19 @@ export default async function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {stats.map((stat) => (
-          <div key={stat.name} className="bg-navy-light/20 border border-white/5 p-8 rounded-3xl hover:border-accent/20 transition-all group">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-white/5 ${stat.color}`}>
+          <Link 
+            key={stat.name} 
+            href={stat.href}
+            className="bg-navy-light/20 border border-white/5 p-8 rounded-3xl hover:border-accent/20 hover:bg-navy-light/30 transition-all group block"
+          >
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-white/5 ${stat.color} group-hover:bg-white/10 transition-colors`}>
               <stat.icon size={24} />
             </div>
             <p className="text-white/40 text-sm font-medium uppercase tracking-wider mb-2">{stat.name}</p>
             <h3 className="text-4xl font-bold font-outfit text-white group-hover:text-accent transition-colors">
               {stat.value}
             </h3>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -85,30 +100,42 @@ export default async function AdminDashboard() {
             <h3 className="text-xl font-bold font-outfit">Quick Actions</h3>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <button className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center">
+            <Link 
+              href="/admin/destinations/new"
+              className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center"
+            >
               <div className="p-3 bg-accent/10 rounded-xl text-accent group-hover:bg-accent group-hover:text-navy transition-all">
                 <MapPin size={20} />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider">New Dest</span>
-            </button>
-            <button className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-white">New Dest</span>
+            </Link>
+            <Link 
+              href="/admin/tours/new"
+              className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center"
+            >
               <div className="p-3 bg-accent/10 rounded-xl text-accent group-hover:bg-accent group-hover:text-navy transition-all">
                 <Plane size={20} />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider">New Tour</span>
-            </button>
-            <button className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-white">New Tour</span>
+            </Link>
+            <Link 
+              href="/admin/blog/new"
+              className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center"
+            >
               <div className="p-3 bg-accent/10 rounded-xl text-accent group-hover:bg-accent group-hover:text-navy transition-all">
                 <FileText size={20} />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider">New Post</span>
-            </button>
-            <button className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-white">New Post</span>
+            </Link>
+            <Link 
+              href="/admin/users"
+              className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/5 hover:border-accent/50 hover:bg-white/5 transition-all group text-center"
+            >
               <div className="p-3 bg-accent/10 rounded-xl text-accent group-hover:bg-accent group-hover:text-navy transition-all">
                 <UsersIcon size={20} />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider">Users</span>
-            </button>
+              <span className="text-xs font-bold uppercase tracking-wider text-white">Users</span>
+            </Link>
           </div>
         </div>
 
