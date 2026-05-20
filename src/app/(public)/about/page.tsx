@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import { 
   Shield, 
@@ -87,11 +88,23 @@ const offerings = [
   }
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
   const breadcrumbItems = [
     { name: "Home", item: "/" },
     { name: "About Us", item: "/about" },
   ];
+
+  let heroImage = "/assets/hero_bg.png";
+  try {
+    const heroSetting = await prisma.setting.findUnique({
+      where: { key: "hero_about" }
+    });
+    if (heroSetting?.value) {
+      heroImage = heroSetting.value;
+    }
+  } catch (error) {
+    console.warn("Failed to fetch hero image setting:", error);
+  }
 
   return (
     <div className="min-h-screen bg-navy text-white">
@@ -101,7 +114,10 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="relative min-h-[60vh] py-20 flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-75 z-10" />
-        <div className="absolute inset-0 bg-[url('/assets/hero-bg.png')] bg-cover bg-center" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: `url('${heroImage}')` }}
+        />
         <div className="container mx-auto px-8 relative z-20 max-w-5xl">
           <p className="text-accent uppercase tracking-widest font-bold mb-4 text-xs sm:text-sm">
             About WildpathAfrica: Kenya&apos;s Boutique Safari Company

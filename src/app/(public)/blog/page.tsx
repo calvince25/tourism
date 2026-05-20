@@ -43,13 +43,28 @@ export default async function BlogIndexPage() {
   const featuredPost = posts[0];
   const remainingPosts = posts.slice(1);
 
+  let heroImage = "/assets/hero_bg.png";
+  try {
+    const heroSetting = await prisma.setting.findUnique({
+      where: { key: "hero_blog" }
+    });
+    if (heroSetting?.value) {
+      heroImage = heroSetting.value;
+    }
+  } catch (error) {
+    console.warn("Failed to fetch hero image setting:", error);
+  }
+
   return (
     <div className="min-h-screen bg-navy">
       <Navbar />
 
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
-        <div className="absolute inset-0 bg-[url('/assets/hero-bg.png')] bg-cover bg-center" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: `url('${heroImage}')` }}
+        />
         <div className="container mx-auto px-8 relative z-20 text-center">
           <p className="text-accent uppercase tracking-widest font-bold mb-4">Stories from the Wild</p>
           <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">Safari Blog</h1>

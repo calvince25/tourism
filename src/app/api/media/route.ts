@@ -55,7 +55,54 @@ export async function GET(req: Request) {
         });
     }
 
-    return NextResponse.json(media)
+    // Read pre-existing assets
+    let assetMedia: any[] = [];
+    try {
+      const assetsDir = path.join(process.cwd(), 'public', 'assets');
+      const assetFiles = await fs.readdir(assetsDir);
+      
+      assetMedia = await Promise.all(
+        assetFiles
+          .filter(file => /\.(webp|png|jpe?g|gif|svg)$/i.test(file))
+          .map(async (file) => {
+            const filePath = path.join(assetsDir, file);
+            let stats = { size: 0, mtime: new Date() };
+            try {
+              stats = await fs.stat(filePath);
+            } catch (e) {}
+
+            let assetCategory = 'General';
+            if (file === 'hero_bg.png') assetCategory = 'Hero';
+            else if (['arctic_wonders.png', 'hawaii_beach.png', 'mountain_stack.png'].includes(file)) assetCategory = 'Tours';
+
+            return {
+              id: `asset-${file}`,
+              filename: file,
+              originalName: file,
+              filePath: `/assets/${file}`,
+              fileUrl: `/assets/${file}`,
+              thumbnailUrl: `/assets/${file}`,
+              mediumUrl: `/assets/${file}`,
+              largeUrl: `/assets/${file}`,
+              category: assetCategory,
+              altText: file.split('.')[0].replace(/_/g, ' '),
+              fileType: 'png',
+              fileSize: stats.size,
+              createdAt: stats.mtime,
+            };
+          })
+      );
+    } catch (assetError) {
+      console.warn("Failed to read public/assets", assetError);
+    }
+
+    const filteredAssets = category && category !== 'All' 
+      ? assetMedia.filter(m => m.category === category)
+      : assetMedia;
+
+    const combinedMedia = [...filteredAssets, ...media];
+
+    return NextResponse.json(combinedMedia)
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -67,8 +114,8 @@ export async function DELETE(req: Request) {
 
   try {
     const { id } = await req.json()
-    if (id.startsWith('phys-')) {
-      // It's a physical mock object, let's succeed immediately for UI convenience
+    if (id.startsWith('phys-') || id.startsWith('asset-')) {
+      // It's a physical or asset mock object, let's succeed immediately for UI convenience
       return NextResponse.json({ success: true })
     }
     await prisma.media.delete({ where: { id } })

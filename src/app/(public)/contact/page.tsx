@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
@@ -11,11 +12,23 @@ export const metadata: Metadata = generateSEOMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
+export default async function ContactPage() {
   const breadcrumbItems = [
     { name: "Home", item: "/" },
     { name: "Contact Us", item: "/contact" },
   ];
+
+  let heroImage = "/assets/hero_bg.png";
+  try {
+    const heroSetting = await prisma.setting.findUnique({
+      where: { key: "hero_contact" }
+    });
+    if (heroSetting?.value) {
+      heroImage = heroSetting.value;
+    }
+  } catch (error) {
+    console.warn("Failed to fetch hero image setting:", error);
+  }
 
   return (
     <div className="min-h-screen bg-navy">
@@ -24,7 +37,10 @@ export default function ContactPage() {
 
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
-        <div className="absolute inset-0 bg-[url('/assets/hero-bg.png')] bg-cover bg-center" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: `url('${heroImage}')` }}
+        />
         <div className="container mx-auto px-8 relative z-20">
           <h1 className="text-5xl md:text-7xl font-bold font-outfit mb-6">Contact Us</h1>
           <p className="text-white/60 max-w-2xl mx-auto text-lg">
