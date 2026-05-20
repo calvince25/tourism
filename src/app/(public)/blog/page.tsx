@@ -45,9 +45,13 @@ export default async function BlogIndexPage() {
 
   let heroImage = "/assets/hero_bg.png";
   try {
-    const heroSetting = await prisma.setting.findUnique({
+    const dbPromise = prisma.setting.findUnique({
       where: { key: "hero_blog" }
     });
+    const timeoutPromise = new Promise<any>((_, reject) => 
+      setTimeout(() => reject(new Error("Timeout")), 2000)
+    );
+    const heroSetting = await Promise.race([dbPromise, timeoutPromise]);
     if (heroSetting?.value) {
       heroImage = heroSetting.value;
     }
@@ -62,9 +66,20 @@ export default async function BlogIndexPage() {
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
         <div 
+          id="hero-bg-blog"
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            try {
+              var customBg = localStorage.getItem('setting_hero_blog');
+              if (customBg) {
+                document.getElementById('hero-bg-blog').style.backgroundImage = "url('" + customBg + "')";
+              }
+            } catch (e) {}
+          })();
+        `}} />
         <div className="container mx-auto px-8 relative z-20 text-center">
           <p className="text-accent uppercase tracking-widest font-bold mb-4">Stories from the Wild</p>
           <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">Safari Blog</h1>

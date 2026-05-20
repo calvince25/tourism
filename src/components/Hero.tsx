@@ -38,18 +38,26 @@ const DestinationCard = ({
   </div>
 );
 
-export default function Hero() {
+export default function Hero({ heroImage = "/assets/hero_bg.png" }: { heroImage?: string }) {
   return (
     <section className="relative min-h-screen w-full flex items-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Image
-          src="/assets/hero_bg.png"
-          alt="Mountain Landscape"
-          fill
-          className="object-cover"
-          priority
+        <div 
+          id="hero-bg-home"
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: `url('${heroImage}')` }}
         />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            try {
+              var customBg = localStorage.getItem('setting_hero_home');
+              if (customBg) {
+                document.getElementById('hero-bg-home').style.backgroundImage = "url('" + customBg + "')";
+              }
+            } catch (e) {}
+          })();
+        `}} />
         <div className="absolute inset-0 bg-navy-deep/50" />
       </div>
 

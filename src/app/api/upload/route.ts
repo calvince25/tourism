@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 
       let media;
       try {
-        media = await prisma.media.create({
+        const dbPromise = prisma.media.create({
           data: {
             filename: baseFilename,
             originalName: file.name,
@@ -85,8 +85,12 @@ export async function POST(req: Request) {
             uploadedById: (session.user as any).id,
           },
         });
+        const timeoutPromise = new Promise<any>((_, reject) => 
+          setTimeout(() => reject(new Error("Timeout")), 2000)
+        );
+        media = await Promise.race([dbPromise, timeoutPromise]);
       } catch (dbError) {
-        console.warn("DB offline, returning mock media record");
+        console.warn("DB offline or timed out, returning mock media record");
         media = {
           id: `mock-m-${Date.now()}`,
           filename: baseFilename,

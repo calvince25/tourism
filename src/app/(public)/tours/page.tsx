@@ -45,9 +45,13 @@ export default async function ToursIndexPage() {
 
   let heroImage = "/assets/hero_bg.png";
   try {
-    const heroSetting = await prisma.setting.findUnique({
+    const dbPromise = prisma.setting.findUnique({
       where: { key: "hero_tours" }
     });
+    const timeoutPromise = new Promise<any>((_, reject) => 
+      setTimeout(() => reject(new Error("Timeout")), 2000)
+    );
+    const heroSetting = await Promise.race([dbPromise, timeoutPromise]);
     if (heroSetting?.value) {
       heroImage = heroSetting.value;
     }
@@ -63,9 +67,20 @@ export default async function ToursIndexPage() {
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
         <div 
+          id="hero-bg-tours"
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            try {
+              var customBg = localStorage.getItem('setting_hero_tours');
+              if (customBg) {
+                document.getElementById('hero-bg-tours').style.backgroundImage = "url('" + customBg + "')";
+              }
+            } catch (e) {}
+          })();
+        `}} />
         <div className="container mx-auto px-8 relative z-20">
           <p className="text-accent uppercase tracking-widest font-bold mb-4">Unforgettable Adventures</p>
           <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">Safari Packages</h1>

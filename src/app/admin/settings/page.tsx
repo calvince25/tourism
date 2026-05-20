@@ -14,10 +14,32 @@ export default function SettingsPage() {
     const fetchSettings = async () => {
       try {
         const res = await fetch("/api/settings");
-        const data = await res.json();
-        if (res.ok) setSettings(data);
+        const dbData = await res.json();
+        if (res.ok && Array.isArray(dbData)) {
+          // Sync database settings to localStorage
+          dbData.forEach((s: any) => {
+            if (s.key && s.value !== undefined) {
+              localStorage.setItem('setting_' + s.key, s.value);
+            }
+          });
+          setSettings(dbData);
+        } else {
+          throw new Error("Invalid setting response");
+        }
       } catch (error) {
-        toast.error("Failed to fetch settings");
+        console.warn("Failed to fetch settings from DB, falling back to localStorage:", error);
+        // Load settings from localStorage
+        const localSettings: any[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('setting_')) {
+            localSettings.push({
+              key: k.replace('setting_', ''),
+              value: localStorage.getItem(k) || ""
+            });
+          }
+        }
+        setSettings(localSettings);
       } finally {
         setLoading(false);
       }
@@ -27,6 +49,11 @@ export default function SettingsPage() {
 
   const handleSave = async (key: string, value: string) => {
     setSaving(true);
+    // Synchronize to localStorage
+    try {
+      localStorage.setItem('setting_' + key, value);
+    } catch (e) {}
+
     try {
       const res = await fetch("/api/settings", {
         method: "POST",
@@ -37,7 +64,7 @@ export default function SettingsPage() {
         toast.success(`Updated ${key.replace('_', ' ')}`);
       }
     } catch (error) {
-      toast.error("Save failed");
+      toast.error("Save failed (saved locally only)");
     } finally {
       setSaving(false);
     }
@@ -77,6 +104,9 @@ export default function SettingsPage() {
 
   const handleResetHero = async (key: string) => {
     if (!confirm("Are you sure you want to reset this hero image to default?")) return;
+    try {
+      localStorage.removeItem('setting_' + key);
+    } catch (e) {}
     try {
       await handleSave(key, "");
       setSettings(prev => prev.map(s => s.key === key ? { ...s, value: "" } : s));
@@ -210,6 +240,7 @@ export default function SettingsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
+            { label: "Home Page", key: "hero_home", defaultVal: "/assets/hero_bg.png" },
             { label: "About Page", key: "hero_about", defaultVal: "/assets/hero_bg.png" },
             { label: "Destinations Page", key: "hero_destinations", defaultVal: "/assets/hero_bg.png" },
             { label: "Tours Page", key: "hero_tours", defaultVal: "/assets/hero_bg.png" },
@@ -250,6 +281,7 @@ export default function SettingsPage() {
                       onChange={(e) => {
                         if (e.target.files?.[0]) {
                           handleHeroUpload(page.key, e.target.files[0]);
+                          e.target.value = "";
                         }
                       }}
                       disabled={isUploading}

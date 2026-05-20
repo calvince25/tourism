@@ -42,10 +42,26 @@ export default async function Home() {
     ];
   }
 
+  let heroImage = "/assets/hero_bg.png";
+  try {
+    const dbPromise = prisma.setting.findUnique({
+      where: { key: "hero_home" }
+    });
+    const timeoutPromise = new Promise<any>((_, reject) => 
+      setTimeout(() => reject(new Error("Timeout")), 2000)
+    );
+    const heroSetting = await Promise.race([dbPromise, timeoutPromise]);
+    if (heroSetting?.value) {
+      heroImage = heroSetting.value;
+    }
+  } catch (error) {
+    console.warn("Failed to fetch home hero setting, using default:", error);
+  }
+
   return (
     <main className="min-h-screen">
       <Navbar />
-      <Hero />
+      <Hero heroImage={heroImage} />
       <StatsSection />
       <AboutUs />
       <Destinations initialCountries={JSON.parse(JSON.stringify(countries))} />
