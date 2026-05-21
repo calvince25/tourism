@@ -74,7 +74,7 @@ export async function POST(req: Request) {
       // Get dimensions from original
       const meta = await sharp(buffer).metadata()
 
-      let uploadedById = (session.user as any).id;
+      let uploadedById = (session?.user as any)?.id as string | undefined;
       if (uploadedById === 'mock-admin') {
         try {
           const exists = await prisma.user.findUnique({ where: { id: 'mock-admin' } })
