@@ -41,14 +41,15 @@ export default function InquiriesPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-10">
       <div>
-        <h1 className="text-4xl font-bold font-outfit text-white mb-2">Booking Inquiries</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold font-outfit text-white mb-2">Booking Inquiries</h1>
         <p className="text-white/40 text-sm">Manage client requests and safari bookings.</p>
       </div>
 
       <div className="bg-navy-light/20 border border-white/5 rounded-3xl overflow-hidden">
-        <table className="w-full text-left">
+        <div className="overflow-x-auto">
+        <table className="w-full text-left min-w-[700px]">
           <thead className="bg-white/5 text-[10px] uppercase tracking-widest font-bold text-white/40">
             <tr>
               <th className="px-8 py-6">Customer</th>
@@ -130,6 +131,7 @@ export default function InquiriesPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
