@@ -33,6 +33,18 @@ export async function POST(req: Request) {
     const { title, excerpt, content, status, featuredImageId } = await req.json();
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
+    let authorId = (session.user as any).id;
+    if (authorId === 'mock-admin') {
+      try {
+        const exists = await prisma.user.findUnique({ where: { id: 'mock-admin' } })
+        if (!exists) {
+          authorId = undefined;
+        }
+      } catch (e) {
+        authorId = undefined;
+      }
+    }
+
     const post = await prisma.blogPost.create({
       data: {
         title,
@@ -41,7 +53,7 @@ export async function POST(req: Request) {
         content,
         status,
         featuredImageId: featuredImageId || null,
-        authorId: (session.user as any).id,
+        authorId,
         publishedAt: status === "PUBLISHED" ? new Date() : null,
       },
     });
