@@ -7,6 +7,7 @@ export async function GET() {
   try {
     const countries = await prisma.country.findMany({
       orderBy: { name: "asc" },
+      include: { coverImage: true },
     });
     return NextResponse.json(countries);
   } catch (error) {
@@ -19,19 +20,22 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { name, code, description } = await req.json();
+    const { name, code, continent, coverImageId } = await req.json();
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    
+
     const country = await prisma.country.create({
       data: {
         name,
         slug,
-        continent: "Africa",
-        flagEmoji: code,
+        continent: continent || "Africa",
+        flagEmoji: code || null,
+        coverImageId: coverImageId || null,
       },
+      include: { coverImage: true },
     });
     return NextResponse.json(country);
   } catch (error) {
+    console.error("Create country error:", error);
     return NextResponse.json({ error: "Failed to create country" }, { status: 500 });
   }
 }
@@ -41,13 +45,20 @@ export async function PUT(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id, isActive } = await req.json();
+    const { id, isActive, coverImageId } = await req.json();
+
+    const updateData: any = {};
+    if (isActive !== undefined) updateData.active = isActive;
+    if (coverImageId !== undefined) updateData.coverImageId = coverImageId;
+
     const updated = await prisma.country.update({
       where: { id },
-      data: { active: isActive },
+      data: updateData,
+      include: { coverImage: true },
     });
     return NextResponse.json(updated);
   } catch (error) {
+    console.error("Update country error:", error);
     return NextResponse.json({ error: "Failed to update country" }, { status: 500 });
   }
 }

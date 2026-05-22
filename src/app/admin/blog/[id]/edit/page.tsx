@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RichTextEditor from "@/components/admin/RichTextEditor";
-import { ArrowLeft, Save, Upload } from "lucide-react";
+import { ArrowLeft, Save, Upload, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 interface Props {
@@ -64,6 +64,8 @@ export default function EditBlogPostPage({ params }: Props) {
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Reset so the same file can be re-selected after removal
+    e.target.value = "";
 
     const toastId = toast.loading("Uploading cover image...");
     try {
@@ -75,18 +77,18 @@ export default function EditBlogPostPage({ params }: Props) {
         body: uploadData,
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        const data = await res.json();
-        const mediaFile = data.media[0];
+        const mediaFile = data.media?.[0];
         if (mediaFile) {
           setFeaturedImageId(mediaFile.id);
           setCoverPreview(mediaFile.fileUrl);
           toast.success("Cover image uploaded!", { id: toastId });
         } else {
-          throw new Error("Invalid response");
+          throw new Error("No media returned from upload");
         }
       } else {
-        const data = await res.json();
         throw new Error(data.error || "Upload failed");
       }
     } catch (error: any) {
@@ -95,8 +97,13 @@ export default function EditBlogPostPage({ params }: Props) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const removeCover = () => {
+    setFeaturedImageId(null);
+    setCoverPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const savePost = async () => {
     if (!formData.title || !formData.content) {
       toast.error("Title and Content are required.");
       return;
@@ -109,19 +116,15 @@ export default function EditBlogPostPage({ params }: Props) {
       const res = await fetch("/api/blog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: params.id,
-          ...formData,
-          featuredImageId,
-        }),
+        body: JSON.stringify({ id: params.id, ...formData, featuredImageId }),
       });
 
+      const data = await res.json();
       if (res.ok) {
         toast.success("Blog post updated successfully!", { id: toastId });
         router.push("/admin/blog");
         router.refresh();
       } else {
-        const data = await res.json();
         throw new Error(data.error || "API failed");
       }
     } catch (error: any) {
@@ -130,6 +133,11 @@ export default function EditBlogPostPage({ params }: Props) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    savePost();
   };
 
   if (loading) {
@@ -153,12 +161,13 @@ export default function EditBlogPostPage({ params }: Props) {
           </div>
         </div>
         <button
-          onClick={handleSubmit}
+          type="button"
+          onClick={savePost}
           disabled={saving}
           className="bg-accent text-navy px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50"
         >
           <Save size={20} />
-          Save Article
+          {saving ? "Saving…" : "Save Article"}
         </button>
       </div>
 
@@ -219,18 +228,25 @@ export default function EditBlogPostPage({ params }: Props) {
             
             {coverPreview ? (
               <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-white/10 group bg-navy-deep">
-                <img 
-                  src={coverPreview} 
-                  alt="Cover preview" 
+                <img
+                  src={coverPreview}
+                  alt="Cover preview"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-navy/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button 
+                <div className="absolute inset-0 bg-navy/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                  <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="bg-white/10 text-white hover:bg-accent hover:text-navy px-6 py-2.5 rounded-xl text-xs font-bold transition-all"
+                    className="bg-white/10 text-white hover:bg-accent hover:text-navy px-5 py-2 rounded-xl text-xs font-bold transition-all"
                   >
-                    Change Image
+                    Change
+                  </button>
+                  <button
+                    type="button"
+                    onClick={removeCover}
+                    className="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                  >
+                    <X size={12} /> Remove
                   </button>
                 </div>
               </div>

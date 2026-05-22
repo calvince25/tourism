@@ -9,11 +9,61 @@ export async function GET(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const inquiries = await prisma.bookingInquiry.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json(inquiries);
+    const [bookings, contacts] = await Promise.all([
+      prisma.bookingInquiry.findMany({ orderBy: { createdAt: "desc" } }),
+      prisma.contactSubmission.findMany({ orderBy: { createdAt: "desc" } }),
+    ]);
+
+    // Merge into a unified shape
+    const unified = [
+      ...bookings.map((b) => ({
+        type: "BOOKING" as const,
+        id: b.id,
+        name: b.name,
+        email: b.email,
+        phone: b.phone ?? null,
+        status: b.status,
+        createdAt: b.createdAt,
+        // booking-specific
+        travelDate: b.travelDate ?? null,
+        travelersAdults: b.travelersAdults,
+        travelersChildren: b.travelersChildren,
+        budgetRange: b.budgetRange ?? null,
+        accommodationPref: b.accommodationPref ?? null,
+        specialRequirements: b.specialRequirements ?? null,
+        // contact-specific
+        message: null,
+        destinationInterest: null,
+      })),
+      ...contacts.map((c) => ({
+        type: "CONTACT" as const,
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        phone: c.phone ?? null,
+        status: c.status,
+        createdAt: c.createdAt,
+        // booking-specific
+        travelDate: null,
+        travelersAdults: null,
+        travelersChildren: null,
+        budgetRange: null,
+        accommodationPref: null,
+        specialRequirements: null,
+        // contact-specific
+        message: c.message,
+        destinationInterest: c.destinationInterest ?? null,
+      })),
+    ];
+
+    // Sort merged list newest first
+    unified.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return NextResponse.json(unified);
   } catch (error) {
+    console.error("GET /api/inquiries error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -23,13 +73,35 @@ export async function PATCH(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { id, status } = await req.json();
+    const { id, status, type } = await req.json();
+
+    if (type === "CONTACT") {
+      // Map InquiryStatus-like values to ContactStatus enum
+      const contactStatusMap: Record<string, "NEW" | "READ" | "REPLIED"> = {
+        NEW: "NEW",
+        CONTACTED: "READ",
+        BOOKED: "REPLIED",
+        QUOTED: "REPLIED",
+        CANCELLED: "NEW",
+        READ: "READ",
+        REPLIED: "REPLIED",
+      };
+      const contactStatus = contactStatusMap[status] ?? "READ";
+      const updated = await prisma.contactSubmission.update({
+        where: { id },
+        data: { status: contactStatus },
+      });
+      return NextResponse.json({ ...updated, type: "CONTACT" });
+    }
+
+    // Default: BOOKING
     const inquiry = await prisma.bookingInquiry.update({
       where: { id },
       data: { status },
     });
-    return NextResponse.json(inquiry);
+    return NextResponse.json({ ...inquiry, type: "BOOKING" });
   } catch (error) {
+    console.error("PATCH /api/inquiries error:", error);
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No files uploaded' }, { status: 400 })
     }
 
-    // Ensure the storage bucket exists
+    // Ensure the storage bucket exists (cached after first call)
     await ensureMediaBucket()
 
     const results = []
@@ -58,18 +58,26 @@ export async function POST(req: Request) {
         { suffix: '-large', width: 1920 },
       ]
 
+      // Parallelize all resizes + uploads for maximum speed
+      const uploadResults = await Promise.all(
+        sizes.map(async (size) => {
+          const filename = `${baseFilename}${size.suffix}.webp`
+          const storagePath = `${datePath}/${filename}`
+
+          const resizedBuffer = await sharp(buffer)
+            .resize(size.width, null, { withoutEnlargement: true })
+            .webp({ quality: 85 })
+            .toBuffer()
+
+          const url = await uploadToStorage(resizedBuffer, storagePath, 'image/webp')
+          return { suffix: size.suffix, url }
+        })
+      )
+
+      // Build URL map from parallel results
       const urls: Record<string, string> = {}
-
-      for (const size of sizes) {
-        const filename = `${baseFilename}${size.suffix}.webp`
-        const storagePath = `${datePath}/${filename}`
-
-        const resizedBuffer = await sharp(buffer)
-          .resize(size.width, null, { withoutEnlargement: true })
-          .webp({ quality: 85 })
-          .toBuffer()
-
-        urls[size.suffix] = await uploadToStorage(resizedBuffer, storagePath, 'image/webp')
+      for (const { suffix, url } of uploadResults) {
+        urls[suffix] = url
       }
 
       // Get dimensions from original
@@ -113,3 +121,4 @@ export async function POST(req: Request) {
     )
   }
 }
+

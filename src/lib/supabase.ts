@@ -64,11 +64,16 @@ export async function deleteFromStorage(publicUrl: string): Promise<void> {
   }
 }
 
+// Module-scoped cache to avoid redundant listBuckets API calls on every upload
+let _isBucketEnsured = false
+
 /**
  * Ensure the media storage bucket exists and is public.
- * Safe to call multiple times (idempotent).
+ * Idempotent — uses an in-memory cache flag so it only checks once per process.
  */
 export async function ensureMediaBucket(): Promise<void> {
+  if (_isBucketEnsured) return
+
   const { data: buckets } = await supabaseAdmin.storage.listBuckets()
   const exists = buckets?.some((b) => b.name === STORAGE_BUCKET)
 
@@ -80,8 +85,11 @@ export async function ensureMediaBucket(): Promise<void> {
     })
     if (error && !error.message.includes('already exists')) {
       console.error('Failed to create media bucket:', error.message)
+      return // Don't mark as ensured if creation failed
     } else {
       console.log(`✅ Supabase Storage bucket "${STORAGE_BUCKET}" created.`)
     }
   }
+
+  _isBucketEnsured = true
 }
