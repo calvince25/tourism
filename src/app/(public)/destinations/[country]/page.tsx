@@ -6,6 +6,8 @@ import Navbar from '@/components/Navbar'
 
 interface Props { params: { country: string } }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let country: any = null;
   try {

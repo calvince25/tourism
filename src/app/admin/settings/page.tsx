@@ -222,36 +222,38 @@ export default function SettingsPage() {
           <div className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-widest text-white/40">Site Name</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input 
                   type="text" 
-                  className="flex-grow bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
+                  className="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
                   value={getVal('site_name')}
                   onChange={(e) => updateLocalVal('site_name', e.target.value)}
                 />
                 <button 
                   onClick={() => handleSave('site_name', getVal('site_name'))}
-                  className="p-3 bg-accent text-navy rounded-xl hover:scale-105 transition-all flex items-center justify-center shrink-0"
+                  className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
                 >
-                  <Save size={20} />
+                  <Save size={18} />
+                  <span>Save</span>
                 </button>
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-widest text-white/40">Site Email</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input 
                   type="email" 
-                  className="flex-grow bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
+                  className="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
                   value={getVal('site_email')}
                   onChange={(e) => updateLocalVal('site_email', e.target.value)}
                 />
                 <button 
                   onClick={() => handleSave('site_email', getVal('site_email'))}
-                  className="p-3 bg-accent text-navy rounded-xl hover:scale-105 transition-all flex items-center justify-center shrink-0"
+                  className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
                 >
-                  <Save size={20} />
+                  <Save size={18} />
+                  <span>Save</span>
                 </button>
               </div>
             </div>
@@ -267,36 +269,38 @@ export default function SettingsPage() {
           <div className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-widest text-white/40">WhatsApp Number</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input 
                   type="text" 
-                  className="flex-grow bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
+                  className="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
                   value={getVal('site_whatsapp')}
                   onChange={(e) => updateLocalVal('site_whatsapp', e.target.value)}
                 />
                 <button 
                   onClick={() => handleSave('site_whatsapp', getVal('site_whatsapp'))}
-                  className="p-3 bg-accent text-navy rounded-xl hover:scale-105 transition-all flex items-center justify-center shrink-0"
+                  className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
                 >
-                  <Save size={20} />
+                  <Save size={18} />
+                  <span>Save</span>
                 </button>
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-widest text-white/40">Instagram URL</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input 
                   type="text" 
-                  className="flex-grow bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
+                  className="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
                   value={getVal('social_instagram')}
                   onChange={(e) => updateLocalVal('social_instagram', e.target.value)}
                 />
                 <button 
                   onClick={() => handleSave('social_instagram', getVal('social_instagram'))}
-                  className="p-3 bg-accent text-navy rounded-xl hover:scale-105 transition-all flex items-center justify-center shrink-0"
+                  className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
                 >
-                  <Save size={20} />
+                  <Save size={18} />
+                  <span>Save</span>
                 </button>
               </div>
             </div>

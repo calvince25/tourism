@@ -26,12 +26,12 @@ export async function POST(req: Request) {
     }
 
     const results = []
-    const MAX_SIZE = 5 * 1024 * 1024 // 5MB limit
+    const MAX_SIZE = 10 * 1024 * 1024 // 10MB limit (canvas pre-compresses client-side)
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
     for (const file of files) {
       if (file.size > MAX_SIZE) {
-        return NextResponse.json({ error: `File size exceeds the 5MB limit (${file.name})` }, { status: 400 })
+        return NextResponse.json({ error: `File size exceeds the 10MB limit (${file.name})` }, { status: 400 })
       }
       if (!ALLOWED_TYPES.includes(file.type)) {
         return NextResponse.json({ error: `Invalid file type. Only JPEG, PNG, WEBP, and GIF are allowed.` }, { status: 400 })
@@ -75,20 +75,14 @@ export async function POST(req: Request) {
       const meta = await sharp(buffer).metadata()
 
       let uploadedById = (session?.user as any)?.id as string | undefined;
-      if (uploadedById === 'mock-admin') {
-        try {
-          const exists = await prisma.user.findUnique({ where: { id: 'mock-admin' } })
-          if (!exists) {
-            uploadedById = undefined;
-          }
-        } catch (e) {
-          uploadedById = undefined;
-        }
+      // Don't store a mock ID that doesn't exist in the DB
+      if (!uploadedById || uploadedById === 'mock-admin') {
+        uploadedById = undefined;
       }
 
       let media;
       try {
-        const dbPromise = prisma.media.create({
+        media = await prisma.media.create({
           data: {
             filename: baseFilename,
             originalName: file.name,
@@ -104,14 +98,10 @@ export async function POST(req: Request) {
             uploadedById,
           },
         });
-        const timeoutPromise = new Promise<any>((_, reject) => 
-          setTimeout(() => reject(new Error("Timeout")), 2000)
-        );
-        media = await Promise.race([dbPromise, timeoutPromise]);
       } catch (dbError) {
-        console.warn("DB offline or timed out, returning mock media record");
+        console.warn("DB error saving media record, returning file URLs without DB entry:", dbError);
         media = {
-          id: `mock-m-${Date.now()}`,
+          id: `local-${Date.now()}`,
           filename: baseFilename,
           originalName: file.name,
           filePath: urls['-large'],
@@ -123,7 +113,6 @@ export async function POST(req: Request) {
           fileSize: buffer.length,
           width: meta.width || 800,
           height: meta.height || 600,
-          uploadedById,
         };
       }
 
@@ -134,9 +123,8 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error('Upload error:', error)
     return NextResponse.json({ 
-      error: 'Internal server error',
+      error: 'Upload failed',
       message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
     }, { status: 500 })
   }
 }

@@ -8,6 +8,8 @@ import type { Metadata } from "next";
 
 interface Props { params: { slug: string } }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await prisma.blogPost.findUnique({
     where: { slug: params.slug },

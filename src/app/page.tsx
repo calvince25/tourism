@@ -5,8 +5,10 @@ import AboutUs from "@/components/AboutUs";
 import Destinations from "@/components/Destinations";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
-  let countries = [];
+  let countries: any[] = [];
   try {
     countries = await prisma.country.findMany({
       where: { active: true },
@@ -20,37 +22,12 @@ export default async function Home() {
       }
     });
   } catch (error) {
-    console.error("Database connection failed, using fallback data.");
-    countries = [
-      {
-        id: "mock-kenya",
-        name: "Kenya",
-        slug: "kenya",
-        destinations: [
-          { id: "1", name: "Maasai Mara", slug: "maasai-mara", shortTeaser: "The world-famous wildlife reserve." },
-          { id: "2", name: "Amboseli", slug: "amboseli", shortTeaser: "Home of the African elephant." },
-        ]
-      },
-      {
-        id: "mock-tz",
-        name: "Tanzania",
-        slug: "tanzania",
-        destinations: [
-          { id: "3", name: "Serengeti", slug: "serengeti", shortTeaser: "Endless plains of wildlife." },
-        ]
-      }
-    ];
+    console.error("Database error:", error);
   }
 
   let heroImage = "/assets/hero_bg.png";
   try {
-    const dbPromise = prisma.setting.findUnique({
-      where: { key: "hero_home" }
-    });
-    const timeoutPromise = new Promise<any>((_, reject) => 
-      setTimeout(() => reject(new Error("Timeout")), 2000)
-    );
-    const heroSetting = await Promise.race([dbPromise, timeoutPromise]);
+    const heroSetting = await prisma.setting.findUnique({ where: { key: "hero_home" } });
     if (heroSetting?.value) {
       heroImage = heroSetting.value;
     }
@@ -68,3 +45,4 @@ export default async function Home() {
     </main>
   );
 }
+

@@ -23,6 +23,8 @@ import BookingButton from "@/components/shared/BookingButton";
 
 interface Props { params: { slug: string } }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let tour: any = null;
   try {

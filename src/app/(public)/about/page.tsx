@@ -26,6 +26,8 @@ export const metadata: Metadata = generateSEOMetadata({
   path: "/about",
 });
 
+export const dynamic = "force-dynamic";
+
 const values = [
   { 
     title: "Every Journey Is Bespoke", 
@@ -123,16 +125,6 @@ export default async function AboutPage() {
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              var customBg = localStorage.getItem('setting_hero_about');
-              if (customBg) {
-                document.getElementById('hero-bg-about').style.backgroundImage = "url('" + customBg + "')";
-              }
-            } catch (e) {}
-          })();
-        `}} />
         <div className="container mx-auto px-8 relative z-20 max-w-5xl">
           <p className="text-accent uppercase tracking-widest font-bold mb-4 text-xs sm:text-sm">
             About WildpathAfrica: Kenya&apos;s Boutique Safari Company

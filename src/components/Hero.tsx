@@ -48,16 +48,6 @@ export default function Hero({ heroImage = "/assets/hero_bg.png" }: { heroImage?
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              var customBg = localStorage.getItem('setting_hero_home');
-              if (customBg) {
-                document.getElementById('hero-bg-home').style.backgroundImage = "url('" + customBg + "')";
-              }
-            } catch (e) {}
-          })();
-        `}} />
         <div className="absolute inset-0 bg-navy-deep/50" />
       </div>
 

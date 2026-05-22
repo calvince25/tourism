@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "Browse our curated selection of safari tour packages in Kenya. From Maasai Mara migrations to Amboseli elephant walks.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function ToursIndexPage() {
   let tours: any[] = [];
   try {
@@ -71,16 +73,6 @@ export default async function ToursIndexPage() {
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              var customBg = localStorage.getItem('setting_hero_tours');
-              if (customBg) {
-                document.getElementById('hero-bg-tours').style.backgroundImage = "url('" + customBg + "')";
-              }
-            } catch (e) {}
-          })();
-        `}} />
         <div className="container mx-auto px-8 relative z-20">
           <p className="text-accent uppercase tracking-widest font-bold mb-4">Unforgettable Adventures</p>
           <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">Safari Packages</h1>

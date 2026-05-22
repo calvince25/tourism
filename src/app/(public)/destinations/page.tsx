@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "Explore the most breathtaking destinations across Africa. Discover Kenya, Tanzania, Uganda, and more.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function DestinationsIndexPage() {
   let countries = [];
   try {
@@ -70,16 +72,6 @@ export default async function DestinationsIndexPage() {
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              var customBg = localStorage.getItem('setting_hero_destinations');
-              if (customBg) {
-                document.getElementById('hero-bg-destinations').style.backgroundImage = "url('" + customBg + "')";
-              }
-            } catch (e) {}
-          })();
-        `}} />
         <div className="container mx-auto px-8 relative z-20">
           <p className="text-accent uppercase tracking-widest font-bold mb-4 animate-fade-in">Explore Africa</p>
           <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">Our Destinations</h1>

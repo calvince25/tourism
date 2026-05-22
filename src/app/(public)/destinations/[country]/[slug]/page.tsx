@@ -12,6 +12,8 @@ import BookingButton from '@/components/shared/BookingButton'
 
 interface Props { params: { country: string; slug: string } }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let destination: any = null;
   try {

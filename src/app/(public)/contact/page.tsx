@@ -12,6 +12,8 @@ export const metadata: Metadata = generateSEOMetadata({
   path: "/contact",
 });
 
+export const dynamic = "force-dynamic";
+
 export default async function ContactPage() {
   const breadcrumbItems = [
     { name: "Home", item: "/" },
@@ -46,16 +48,6 @@ export default async function ContactPage() {
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              var customBg = localStorage.getItem('setting_hero_contact');
-              if (customBg) {
-                document.getElementById('hero-bg-contact').style.backgroundImage = "url('" + customBg + "')";
-              }
-            } catch (e) {}
-          })();
-        `}} />
         <div className="container mx-auto px-8 relative z-20">
           <h1 className="text-5xl md:text-7xl font-bold font-outfit mb-6">Contact Us</h1>
           <p className="text-white/60 max-w-2xl mx-auto text-lg">

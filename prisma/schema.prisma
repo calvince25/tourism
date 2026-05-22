@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -66,22 +66,22 @@ model Destination {
   countryId     String
   country       Country     @relation(fields: [countryId], references: [id])
 
-  shortTeaser   String?     @db.VarChar(200)  // For index cards
+  shortTeaser   String?  // For index cards
 
   // Rich content
-  contentIntro        String?   @db.Text
-  contentWhyVisit     String?   @db.Text
-  contentBestTime     String?   @db.Text
-  contentWildlife     String?   @db.Text
-  contentCulture      String?   @db.Text
-  contentGettingThere String?   @db.Text
-  contentAccommodation String?  @db.Text
-  contentTravelTips   String?   @db.Text
+  contentIntro        String?
+  contentWhyVisit     String?
+  contentBestTime     String?
+  contentWildlife     String?
+  contentCulture      String?
+  contentGettingThere String?
+  contentAccommodation String?
+  contentTravelTips   String?
   totalWordCount      Int       @default(0)
 
   // SEO
-  metaTitle       String?   @db.VarChar(65)
-  metaDescription String?   @db.VarChar(165)
+  metaTitle       String?
+  metaDescription String?
   focusKeyword    String?
   secondaryKeywords Json?                     // ["keyword1","keyword2"]
   canonicalUrl    String?
@@ -129,7 +129,7 @@ model Attraction {
   destinationId String
   destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
   name          String
-  description   String?     @db.Text
+  description   String?
   photoId       String?
   photo         Media?      @relation("AttractionPhoto", fields: [photoId], references: [id])
   attractionType String?    // "Wildlife" | "Marine" | "Cultural" | "Viewpoint" | "Adventure"
@@ -153,8 +153,8 @@ model DestinationFaq {
   id            String      @id @default(cuid())
   destinationId String
   destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
-  question      String      @db.Text
-  answer        String      @db.Text
+  question      String
+  answer        String
   sortOrder     Int         @default(0)
 }
 
@@ -163,8 +163,8 @@ model Tour {
   id               String   @id @default(cuid())
   name             String
   slug             String   @unique
-  shortDescription String?  @db.VarChar(300)
-  fullDescription  String?  @db.Text
+  shortDescription String?
+  fullDescription  String?
   priceKes         Int?
   priceUsd         Int?
   durationDays     Int
@@ -180,8 +180,8 @@ model Tour {
   coverImage       Media?   @relation("TourCover", fields: [coverImageId], references: [id])
   heroImageId      String?
   heroImage        Media?   @relation("TourHero", fields: [heroImageId], references: [id])
-  metaTitle        String?  @db.VarChar(65)
-  metaDescription  String?  @db.VarChar(165)
+  metaTitle        String?
+  metaDescription  String?
   focusKeyword     String?
   ogImageId        String?
   ogImage          Media?   @relation("TourOgImage", fields: [ogImageId], references: [id])
@@ -225,7 +225,7 @@ model TourItineraryDay {
   tour             Tour    @relation(fields: [tourId], references: [id], onDelete: Cascade)
   dayNumber        Int
   title            String
-  description      String? @db.Text
+  description      String?
   location         String?
   photoId          String?
   photo            Media?  @relation("ItineraryPhoto", fields: [photoId], references: [id])
@@ -267,8 +267,8 @@ model TourFaq {
   id        String @id @default(cuid())
   tourId    String
   tour      Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
-  question  String @db.Text
-  answer    String @db.Text
+  question  String
+  answer    String
   sortOrder Int    @default(0)
 }
 
@@ -317,16 +317,16 @@ model BlogPost {
   id              String     @id @default(cuid())
   title           String
   slug            String     @unique
-  excerpt         String?    @db.Text
-  content         String     @db.Text       // HTML from TipTap
+  excerpt         String?
+  content         String       // HTML from TipTap
   featuredImageId String?
   featuredImage   Media?     @relation("BlogFeatured", fields: [featuredImageId], references: [id])
   authorId        String?
   author          User?      @relation(fields: [authorId], references: [id])
   category        String?
   tags            Json?
-  metaTitle       String?    @db.VarChar(65)
-  metaDescription String?    @db.VarChar(165)
+  metaTitle       String?
+  metaDescription String?
   ogImageId       String?
   ogImage         Media?     @relation("BlogOgImage", fields: [ogImageId], references: [id])
   schemaJson      Json?
@@ -346,8 +346,8 @@ enum BlogStatus {
 // ─── FAQs ─────────────────────────────────────────────────────────
 model Faq {
   id        String    @id @default(cuid())
-  question  String    @db.Text
-  answer    String    @db.Text
+  question  String
+  answer    String
   category  String                    // "Booking" | "Payment" | "Visas" | "Safety" etc.
   sortOrder Int       @default(0)
   status    FaqStatus @default(ACTIVE)
@@ -372,7 +372,7 @@ model Review {
   userId          String?
   user            User?        @relation(fields: [userId], references: [id])
   rating          Int
-  reviewText      String       @db.Text
+  reviewText      String
   status          ReviewStatus @default(PENDING)
   featured        Boolean      @default(false)
   createdAt       DateTime     @default(now())
@@ -391,7 +391,7 @@ model ContactSubmission {
   email               String
   phone               String?
   destinationInterest String?
-  message             String   @db.Text
+  message             String
   status              ContactStatus @default(NEW)
   createdAt            DateTime @default(now())
 }
@@ -415,7 +415,7 @@ model BookingInquiry {
   travelersChildren    Int           @default(0)
   budgetRange          String?
   accommodationPref    String?
-  specialRequirements  String?       @db.Text
+  specialRequirements  String?
   status               InquiryStatus @default(NEW)
   createdAt            DateTime      @default(now())
 }
@@ -446,7 +446,7 @@ enum SubscriberStatus {
 model Setting {
   id          String   @id @default(cuid())
   key         String   @unique
-  value       String?  @db.Text
+  value       String?
   description String?
   updatedAt   DateTime @updatedAt
 }
