@@ -35,6 +35,7 @@ export default async function CountryDestinationsPage({ params }: Props) {
     country = await prisma.country.findUnique({
       where: { slug: params.country, active: true },
       include: {
+        coverImage: true,
         destinations: {
           where: { status: 'PUBLISHED' },
           orderBy: { sortOrder: 'asc' },
@@ -58,6 +59,8 @@ export default async function CountryDestinationsPage({ params }: Props) {
     ],
   }
 
+  const coverUrl = country.coverImage?.fileUrl || "/assets/hero-bg.png";
+
   return (
     <div className="min-h-screen bg-navy">
       <Navbar />
@@ -66,7 +69,10 @@ export default async function CountryDestinationsPage({ params }: Props) {
       {/* Hero Banner */}
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
-        <div className="absolute inset-0 bg-[url('/assets/hero-bg.png')] bg-cover bg-center" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: `url('${coverUrl}')` }}
+        />
         <div className="container mx-auto px-8 relative z-20 text-center">
           <p className="text-accent uppercase tracking-widest font-bold mb-4 animate-fade-in">Experience the Magic of</p>
           <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">
