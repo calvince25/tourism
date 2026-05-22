@@ -41,7 +41,7 @@ export default function UsersAdminPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
+        setUsers(users.map(u => u.id === id ? { ...u, ...data } : u));
         toast.success(`User status updated to ${newStatus}`, { id: toastId });
       } else {
         throw new Error(data.error || "API failed");
@@ -49,6 +49,27 @@ export default function UsersAdminPage() {
     } catch (error: any) {
       console.error("Update user error:", error);
       toast.error(error.message || "Failed to update user", { id: toastId });
+    }
+  };
+
+  const handleUpdateRole = async (id: string, newRole: string) => {
+    const toastId = toast.loading("Updating user role...");
+    try {
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, role: newRole }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers(users.map(u => u.id === id ? { ...u, ...data } : u));
+        toast.success(`User role updated to ${newRole}`, { id: toastId });
+      } else {
+        throw new Error(data.error || "API failed");
+      }
+    } catch (error: any) {
+      console.error("Update role error:", error);
+      toast.error(error.message || "Failed to update role", { id: toastId });
     }
   };
 
@@ -116,10 +137,22 @@ export default function UsersAdminPage() {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <div className="flex items-center gap-1 text-white/60">
-                      <Shield size={14} className="text-accent" />
-                      <span className="text-xs font-semibold">{user.role}</span>
-                    </div>
+                    {user.role === 'SUPER_ADMIN' ? (
+                      <div className="flex items-center gap-1 text-white/60">
+                        <Shield size={14} className="text-accent" />
+                        <span className="text-xs font-semibold">{user.role}</span>
+                      </div>
+                    ) : (
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleUpdateRole(user.id, e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white/80 focus:outline-none focus:border-accent hover:bg-white/10 transition-colors"
+                      >
+                        <option value="PENDING" className="bg-navy text-white" disabled>PENDING</option>
+                        <option value="ADMIN" className="bg-navy text-white">ADMIN</option>
+                        <option value="EDITOR" className="bg-navy text-white">EDITOR</option>
+                      </select>
+                    )}
                   </td>
                   <td className="px-8 py-6">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${

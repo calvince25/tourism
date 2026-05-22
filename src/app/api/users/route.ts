@@ -50,9 +50,22 @@ export async function PUT(req: Request) {
       );
     }
 
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const updateData: any = {}
-    if (status) updateData.status = status
-    if (role) updateData.role = role
+    if (status) {
+      updateData.status = status;
+      if (status === "ACTIVE" && existingUser.role === "PENDING") {
+        updateData.role = "EDITOR";
+      }
+    }
+    if (role) updateData.role = role;
 
     const updated = await prisma.user.update({
       where: { id },

@@ -23,12 +23,13 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Spam protection (skip in dev if no token provided)
+        // Spam protection (skip in dev or for default admin if no token provided)
         const token = credentials?.turnstileToken;
-        if (!token && process.env.NODE_ENV === "production") {
+        const isDefaultAdmin = credentials.email.toLowerCase() === "omondicalvince4714@gmail.com";
+        if (!token && process.env.NODE_ENV === "production" && !isDefaultAdmin) {
           throw new Error("Verification check is required.");
         }
-        if (token) {
+        if (token && !isDefaultAdmin) {
           const { verifyTurnstileToken } = await import("./security");
           const isCheckPassed = await verifyTurnstileToken(token);
           if (!isCheckPassed) {
