@@ -7,8 +7,8 @@ async function main() {
     { key: 'site_name',        value: 'WildpathAfrica' },
     { key: 'site_tagline',     value: 'Where Every Path Leads to Wonder' },
     { key: 'site_email',       value: 'info@wildpathafrica.co.ke' },
-    { key: 'site_phone',       value: '+254 700 000 000' },
-    { key: 'site_whatsapp',    value: '+254700000000' },
+    { key: 'site_phone',       value: '+254 704 059 438' },
+    { key: 'site_whatsapp',    value: '254704059438' },
     { key: 'site_address',     value: 'Nairobi, Kenya' },
     { key: 'social_facebook',  value: 'https://facebook.com/wildpathafrica' },
     { key: 'social_instagram', value: 'https://instagram.com/wildpathafrica' },
@@ -72,9 +72,10 @@ async function main() {
     { category: 'Sustainability', sortOrder: 1, question: 'Is WildpathAfrica committed to sustainable tourism?', answer: 'Yes. We exclusively partner with KWS-licensed operators and eco-certified lodges, limit group sizes to reduce wildlife disturbance, support Maasai and local community enterprises.' },
   ]
 
-  for (const f of faqs) {
-    await prisma.faq.create({ data: f }).catch(() => {})
-  }
+  await prisma.faq.createMany({
+    data: faqs,
+    skipDuplicates: true,
+  })
   console.log('✅ FAQs seeded')
   console.log('✅ Database seeded successfully!')
 }
