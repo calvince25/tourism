@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     country = await prisma.country.findUnique({ where: { slug: params.country } })
   } catch (e) {
-    country = { name: params.country.charAt(0).toUpperCase() + params.country.slice(1), slug: params.country }
+    console.error("Failed to fetch country metadata:", e);
   }
 
   if (!country) return {}
@@ -43,15 +43,7 @@ export default async function CountryDestinationsPage({ params }: Props) {
       },
     })
   } catch (e) {
-    country = {
-      id: 'mock',
-      name: params.country.charAt(0).toUpperCase() + params.country.slice(1),
-      slug: params.country,
-      flagEmoji: '🌍',
-      destinations: [
-        { id: '1', name: 'Sample Destination', slug: 'sample', shortTeaser: 'A beautiful place to explore.' }
-      ]
-    }
+    console.error("Failed to fetch country destinations:", e);
   }
 
   if (!country) notFound()

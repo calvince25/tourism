@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 30 * 60, // Enforce session logout after 30 minutes of inactivity
+    maxAge: 30 * 60, // 30 minutes
   },
   pages: {
     signIn: "/auth/login",
@@ -23,67 +23,46 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // 1. Verify Spam Protection Token (unless bypassed in local dev fallback check)
-        if (
-          credentials.email !== "omondicalvince4714@gmail.com" ||
-          credentials.password !== "sambusa"
-        ) {
-          const token = credentials?.turnstileToken;
-          if (!token && process.env.NODE_ENV === "production") {
-            throw new Error("Verification check is required.");
-          }
-          if (token) {
-            const { verifyTurnstileToken } = await import("./security");
-            const isCheckPassed = await verifyTurnstileToken(token);
-            if (!isCheckPassed) {
-              throw new Error("Spam protection check failed.");
-            }
+        // Spam protection (skip in dev if no token provided)
+        const token = credentials?.turnstileToken;
+        if (!token && process.env.NODE_ENV === "production") {
+          throw new Error("Verification check is required.");
+        }
+        if (token) {
+          const { verifyTurnstileToken } = await import("./security");
+          const isCheckPassed = await verifyTurnstileToken(token);
+          if (!isCheckPassed) {
+            throw new Error("Spam protection check failed.");
           }
         }
 
-        // Fallback for requested mock admin if DB is down
-        if (
-          credentials.email === "omondicalvince4714@gmail.com" &&
-          credentials.password === "sambusa"
-        ) {
-          return {
-            id: "mock-admin",
-            name: "Calvince",
-            email: credentials.email,
-            role: "SUPER_ADMIN",
-            status: "ACTIVE",
-          };
+        // Authenticate against Supabase (via Prisma)
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user) return null;
+
+        const valid = await bcrypt.compare(credentials.password, user.password);
+        if (!valid) return null;
+
+        if (user.status === "PENDING" || user.role === "PENDING") {
+          throw new Error(
+            "Your account is pending authorization from the administrator. Please wait."
+          );
         }
 
-        try {
-          const user = await prisma.user.findUnique({ where: { email: credentials.email } });
-          if (!user) return null;
-
-          const valid = await bcrypt.compare(credentials.password, user.password);
-          if (!valid) return null;
-
-          if (user.status === "PENDING" || user.role === "PENDING") {
-            throw new Error("Your account is pending authorization from the administrator. Please wait.");
-          }
-
-          if (user.status === "SUSPENDED") {
-            throw new Error("Your account has been suspended.");
-          }
-
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            status: user.status,
-          };
-        } catch (error: any) {
-          if (error instanceof Error && (error.message.includes("pending") || error.message.includes("suspended"))) {
-            throw error;
-          }
-          console.error("Auth DB connection error:", error);
-          return null;
+        if (user.status === "SUSPENDED") {
+          throw new Error("Your account has been suspended.");
         }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+        };
       },
     }),
   ],

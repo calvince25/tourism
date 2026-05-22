@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function DestinationsIndexPage() {
-  let countries = [];
+  let countries: any[] = [];
   try {
     countries = await prisma.country.findMany({
       where: { active: true },
@@ -26,22 +26,8 @@ export default async function DestinationsIndexPage() {
       orderBy: { sortOrder: "asc" }
     });
   } catch (error) {
-    countries = [
-      {
-        id: "mock-1",
-        name: "Kenya",
-        slug: "kenya",
-        flagEmoji: "🇰🇪",
-        _count: { destinations: 5 }
-      },
-      {
-        id: "mock-2",
-        name: "Tanzania",
-        slug: "tanzania",
-        flagEmoji: "🇹🇿",
-        _count: { destinations: 3 }
-      }
-    ];
+    console.error("Database connection failed fetching public countries list:", error);
+    countries = [];
   }
 
   let heroImage = "/assets/hero_bg.png";

@@ -48,16 +48,9 @@ export default function NewBlogPostPage() {
       } else {
         throw new Error("Upload failed");
       }
-    } catch (error) {
-      console.warn("Upload failed, setting offline preview.");
-      // Fallback preview
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setCoverPreview(event.target?.result as string);
-        setFeaturedImageId(`mock-img-${Date.now()}`);
-        toast.success("Cover image set as local preview (Offline)", { id: toastId });
-      };
-      reader.readAsDataURL(file);
+    } catch (error: any) {
+      console.error("Cover upload error:", error);
+      toast.error(error.message || "Failed to upload cover image", { id: toastId });
     }
   };
 
@@ -85,12 +78,12 @@ export default function NewBlogPostPage() {
         toast.success("Blog post saved successfully!", { id: toastId });
         router.push("/admin/blog");
       } else {
-        throw new Error("API failed");
+        const data = await res.json();
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      toast.success("Mock: Saved blog post locally (DB Offline)!", { id: toastId });
-      // Redirect back to list
-      router.push("/admin/blog");
+    } catch (error: any) {
+      console.error("Save blog post error:", error);
+      toast.error(error.message || "Failed to save blog post", { id: toastId });
     } finally {
       setLoading(false);
     }

@@ -167,17 +167,8 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         throw new Error("Upload API failed");
       }
     } catch (error) {
-      console.warn("Upload failed, falling back to Base64 preview.");
-      // Fallback: Read as base64 so it still inserts offline!
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64Url = event.target?.result as string;
-        if (base64Url && editor) {
-          editor.chain().focus().setImage({ src: base64Url }).run();
-          toast.success("Inserted as local preview (DB offline)", { id: toastId });
-        }
-      };
-      reader.readAsDataURL(file);
+      console.error("Image upload failed:", error);
+      toast.error("Failed to upload image. Please try again.", { id: toastId });
     }
 
     // Reset input

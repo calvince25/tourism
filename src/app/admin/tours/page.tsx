@@ -4,26 +4,15 @@ import Image from "next/image";
 import { Plus, Edit3, Trash2, Calendar, DollarSign, Clock } from "lucide-react";
 
 export default async function ToursListPage() {
-  let tours = [];
+  let tours: any[] = [];
   try {
     tours = await prisma.tour.findMany({
       include: { coverImage: true },
       orderBy: { createdAt: 'desc' }
     });
   } catch (error) {
-    console.error("Database connection failed, loading mock tours.");
-    tours = [
-      {
-        id: "mock-tour-1",
-        name: "Classic Kenya Safari Tour",
-        travelStyle: "Safari",
-        durationDays: 7,
-        durationNights: 6,
-        priceUsd: 1500,
-        status: "PUBLISHED",
-        coverImage: { fileUrl: "/assets/placeholder.png" }
-      }
-    ];
+    console.error("Database connection failed fetching tours:", error);
+    tours = [];
   }
 
   return (

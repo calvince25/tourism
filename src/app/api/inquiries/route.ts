@@ -84,33 +84,8 @@ export async function POST(req: Request) {
       }
     }
 
-    let inquiry;
-    try {
-      inquiry = await prisma.bookingInquiry.create({
-        data: {
-          tourId: tourId || null,
-          destinationId: destinationId || null,
-          name: cleanName,
-          email: cleanEmail,
-          phone: cleanPhone,
-          whatsapp: cleanWhatsapp,
-          travelDate: parsedTravelDate,
-          travelersAdults: parseInt(String(travelersAdults), 10) || 1,
-          travelersChildren: parseInt(String(travelersChildren), 10) || 0,
-          budgetRange: cleanBudgetRange,
-          accommodationPref: cleanAccommodationPref,
-          specialRequirements: cleanSpecialReqs,
-        },
-      });
-    } catch (dbError) {
-      console.warn("Database connection issue. Booking inquiry logged in memory:", {
-        cleanName,
-        cleanEmail,
-        cleanPhone,
-      });
-      // Fallback response for visual confirmation
-      inquiry = {
-        id: `mock-bi-${Date.now()}`,
+    const inquiry = await prisma.bookingInquiry.create({
+      data: {
         tourId: tourId || null,
         destinationId: destinationId || null,
         name: cleanName,
@@ -123,10 +98,8 @@ export async function POST(req: Request) {
         budgetRange: cleanBudgetRange,
         accommodationPref: cleanAccommodationPref,
         specialRequirements: cleanSpecialReqs,
-        status: "NEW",
-        createdAt: new Date(),
-      };
-    }
+      },
+    });
 
     return NextResponse.json({ success: true, data: inquiry });
   } catch (error) {

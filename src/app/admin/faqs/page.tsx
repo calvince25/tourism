@@ -18,26 +18,12 @@ export default function FaqsAdminPage() {
         const data = await res.json();
         setFaqs(data);
       } else {
-        throw new Error("Failed to fetch");
+        const data = await res.json();
+        throw new Error(data.error || "Failed to fetch FAQs");
       }
-    } catch (error) {
-      console.warn("DB offline, loading mock FAQs.");
-      setFaqs([
-        {
-          id: "mock-faq-1",
-          question: "What is the best time of year to go on a safari in Kenya?",
-          answer: "The best time is during the dry season from June to October, which also coincides with the Great Wildebeest Migration in the Maasai Mara.",
-          category: "Planning",
-          status: "ACTIVE"
-        },
-        {
-          id: "mock-faq-2",
-          question: "Do I need a visa to enter Kenya?",
-          answer: "Most foreign nationals require an Electronic Travel Authorisation (eTA) to enter Kenya. We recommend applying at least two weeks before travel.",
-          category: "Visas",
-          status: "ACTIVE"
-        }
-      ]);
+    } catch (error: any) {
+      console.error("Fetch FAQs error:", error);
+      toast.error(error.message || "Failed to load FAQs");
     } finally {
       setLoading(false);
     }
@@ -50,6 +36,7 @@ export default function FaqsAdminPage() {
   const handleAddFaq = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFaq.question || !newFaq.answer) return;
+    const toastId = toast.loading("Adding FAQ...");
 
     try {
       const res = await fetch("/api/faqs", {
@@ -57,63 +44,58 @@ export default function FaqsAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newFaq),
       });
+      const data = await res.json();
       if (res.ok) {
-        const created = await res.json();
-        setFaqs([...faqs, created]);
-        toast.success("FAQ added successfully");
+        setFaqs([...faqs, data]);
+        toast.success("FAQ added successfully", { id: toastId });
         setShowAddForm(false);
         setNewFaq({ question: "", answer: "", category: "Booking" });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      const mockCreated = {
-        id: `mock-faq-${Date.now()}`,
-        question: newFaq.question,
-        answer: newFaq.answer,
-        category: newFaq.category,
-        status: "ACTIVE"
-      };
-      setFaqs([...faqs, mockCreated]);
-      toast.success("Mock: FAQ added successfully (Offline mode)");
-      setShowAddForm(false);
-      setNewFaq({ question: "", answer: "", category: "Booking" });
+    } catch (error: any) {
+      console.error("Add FAQ error:", error);
+      toast.error(error.message || "Failed to add FAQ", { id: toastId });
     }
   };
 
   const handleToggleStatus = async (id: string, currentStatus: string) => {
     const nextStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    const toastId = toast.loading("Updating status...");
     try {
       const res = await fetch("/api/faqs", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: nextStatus }),
       });
+      const data = await res.json();
       if (res.ok) {
         setFaqs(faqs.map(f => f.id === id ? { ...f, status: nextStatus } : f));
-        toast.success("Status updated");
+        toast.success("Status updated", { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      setFaqs(faqs.map(f => f.id === id ? { ...f, status: nextStatus } : f));
-      toast.success("Mock: Status updated");
+    } catch (error: any) {
+      console.error("Toggle FAQ status error:", error);
+      toast.error(error.message || "Failed to update status", { id: toastId });
     }
   };
 
   const handleDeleteFaq = async (id: string) => {
     if (!confirm("Are you sure you want to delete this FAQ?")) return;
+    const toastId = toast.loading("Deleting FAQ...");
     try {
       const res = await fetch(`/api/faqs?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
       if (res.ok) {
         setFaqs(faqs.filter(f => f.id !== id));
-        toast.success("FAQ deleted successfully");
+        toast.success("FAQ deleted successfully", { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      setFaqs(faqs.filter(f => f.id !== id));
-      toast.success("Mock: FAQ deleted successfully");
+    } catch (error: any) {
+      console.error("Delete FAQ error:", error);
+      toast.error(error.message || "Failed to delete FAQ", { id: toastId });
     }
   };
 

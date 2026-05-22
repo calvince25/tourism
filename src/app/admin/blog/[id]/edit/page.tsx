@@ -47,18 +47,12 @@ export default function EditBlogPostPage({ params }: Props) {
             }
           }
         } else {
-          throw new Error("Failed to fetch");
+          const data = await res.json();
+          throw new Error(data.error || "Failed to fetch post");
         }
-      } catch (error) {
-        console.warn("DB offline, using mock post fallback for edit.");
-        setFormData({
-          title: "The Ultimate Guide to Maasai Mara Safari",
-          excerpt: "Everything you need to know before visiting Maasai Mara.",
-          content: "<h1>Maasai Mara</h1><p>Welcome to the ultimate guide to the Maasai Mara...</p>",
-          status: "PUBLISHED",
-        });
-        setCoverPreview("/assets/placeholder.png");
-        setFeaturedImageId("mock-img-1");
+      } catch (error: any) {
+        console.error("Fetch post error:", error);
+        toast.error(error.message || "Failed to load blog post details.");
       } finally {
         setLoading(false);
       }
@@ -92,17 +86,12 @@ export default function EditBlogPostPage({ params }: Props) {
           throw new Error("Invalid response");
         }
       } else {
-        throw new Error("Upload failed");
+        const data = await res.json();
+        throw new Error(data.error || "Upload failed");
       }
-    } catch (error) {
-      console.warn("Upload failed, setting offline preview.");
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setCoverPreview(event.target?.result as string);
-        setFeaturedImageId(`mock-img-${Date.now()}`);
-        toast.success("Cover image set as local preview (Offline)", { id: toastId });
-      };
-      reader.readAsDataURL(file);
+    } catch (error: any) {
+      console.error("Cover upload error:", error);
+      toast.error(error.message || "Failed to upload cover image", { id: toastId });
     }
   };
 
@@ -132,11 +121,12 @@ export default function EditBlogPostPage({ params }: Props) {
         router.push("/admin/blog");
         router.refresh();
       } else {
-        throw new Error("API failed");
+        const data = await res.json();
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      toast.success("Mock: Saved blog post updates locally (DB Offline)!", { id: toastId });
-      router.push("/admin/blog");
+    } catch (error: any) {
+      console.error("Save blog post error:", error);
+      toast.error(error.message || "Failed to save blog post", { id: toastId });
     } finally {
       setSaving(false);
     }

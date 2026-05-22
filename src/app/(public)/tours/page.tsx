@@ -21,28 +21,8 @@ export default async function ToursIndexPage() {
       orderBy: { createdAt: "desc" }
     });
   } catch (error) {
-    tours = [
-      {
-        id: "mock-1",
-        name: "Classic Kenya Safari",
-        slug: "classic-kenya-safari",
-        shortDescription: "Experience the best of Kenya's wildlife in one unforgettable week.",
-        priceUsd: 1800,
-        durationDays: 7,
-        travelStyle: "Safari",
-        coverImage: { fileUrl: "/assets/placeholder.png" }
-      },
-      {
-        id: "mock-2",
-        name: "Maasai Mara Migration",
-        slug: "maasai-mara-migration",
-        shortDescription: "Witness the eighth wonder of the world: the Great Migration.",
-        priceUsd: 2200,
-        durationDays: 5,
-        travelStyle: "Safari",
-        coverImage: { fileUrl: "/assets/placeholder.png" }
-      }
-    ];
+    console.error("Database connection failed fetching public tours list:", error);
+    tours = [];
   }
 
   let heroImage = "/assets/hero_bg.png";

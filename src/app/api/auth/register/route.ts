@@ -15,7 +15,10 @@ export async function POST(req: Request) {
     // 1. Verify Turnstile token
     const isBotCheckPassed = await verifyTurnstileToken(turnstileToken);
     if (!isBotCheckPassed) {
-      return NextResponse.json({ error: "Spam protection verification failed." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Spam protection verification failed." },
+        { status: 400 }
+      );
     }
 
     // 2. Validate input fields
@@ -23,7 +26,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Name is required." }, { status: 400 });
     }
     if (!email || !validateEmail(email)) {
-      return NextResponse.json({ error: "A valid email is required." }, { status: 400 });
+      return NextResponse.json(
+        { error: "A valid email is required." },
+        { status: 400 }
+      );
     }
 
     // 3. Enforce password strength
@@ -37,9 +43,14 @@ export async function POST(req: Request) {
     const cleanEmail = sanitizeInput(email).toLowerCase();
     const cleanPhone = phone ? sanitizeInput(phone) : null;
 
-    const existingUser = await prisma.user.findUnique({ where: { email: cleanEmail } });
+    const existingUser = await prisma.user.findUnique({
+      where: { email: cleanEmail },
+    });
     if (existingUser) {
-      return NextResponse.json({ error: "Email already registered." }, { status: 409 });
+      return NextResponse.json(
+        { error: "Email already registered." },
+        { status: 409 }
+      );
     }
 
     const userCount = await prisma.user.count();
@@ -47,7 +58,7 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name: cleanName,
         email: cleanEmail,
@@ -69,10 +80,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      {
-        error:
-          "Database connection failed. However, a mock admin account (omondicalvince4714@gmail.com / sambusa) is active, so you can just log in directly without registering!",
-      },
+      { error: "Registration failed. Please try again." },
       { status: 500 }
     );
   }

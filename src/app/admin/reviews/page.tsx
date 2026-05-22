@@ -16,36 +16,12 @@ export default function ReviewsAdminPage() {
         const data = await res.json();
         setReviews(data);
       } else {
-        throw new Error("Failed to fetch");
+        const data = await res.json();
+        throw new Error(data.error || "Failed to fetch reviews");
       }
-    } catch (error) {
-      console.warn("DB offline, loading mock reviews.");
-      setReviews([
-        {
-          id: "mock-rev-1",
-          travellerName: "Alice Johnson",
-          travellerEmail: "alice@example.com",
-          travellerCountry: "United Kingdom",
-          rating: 5,
-          reviewText: "We had a spectacular 7-day tour with WildpathAfrica. The guides were exceptionally knowledgeable, and the camps were highly premium.",
-          status: "PENDING",
-          featured: false,
-          tour: { name: "Classic Kenya Safari Tour" },
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: "mock-rev-2",
-          travellerName: "Bob Smith",
-          travellerEmail: "bob@example.com",
-          travellerCountry: "United States",
-          rating: 4,
-          reviewText: "Overall a very solid trip, saw the Big Five on day three! Highly recommended.",
-          status: "APPROVED",
-          featured: true,
-          destination: { name: "Maasai Mara National Reserve" },
-          createdAt: new Date().toISOString()
-        }
-      ]);
+    } catch (error: any) {
+      console.error("Fetch reviews error:", error);
+      toast.error(error.message || "Failed to load reviews");
     } finally {
       setLoading(false);
     }
@@ -56,57 +32,63 @@ export default function ReviewsAdminPage() {
   }, []);
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
+    const toastId = toast.loading("Updating review status...");
     try {
       const res = await fetch("/api/reviews", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
+      const data = await res.json();
       if (res.ok) {
         setReviews(reviews.map(r => r.id === id ? { ...r, status: newStatus } : r));
-        toast.success(`Review status updated to ${newStatus}`);
+        toast.success(`Review status updated to ${newStatus}`, { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      setReviews(reviews.map(r => r.id === id ? { ...r, status: newStatus } : r));
-      toast.success(`Mock: Review status updated to ${newStatus}`);
+    } catch (error: any) {
+      console.error("Update review status error:", error);
+      toast.error(error.message || "Failed to update status", { id: toastId });
     }
   };
 
   const handleToggleFeatured = async (id: string, currentFeatured: boolean) => {
     const nextFeatured = !currentFeatured;
+    const toastId = toast.loading(nextFeatured ? "Featuring review..." : "Unfeaturing review...");
     try {
       const res = await fetch("/api/reviews", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, featured: nextFeatured }),
       });
+      const data = await res.json();
       if (res.ok) {
         setReviews(reviews.map(r => r.id === id ? { ...r, featured: nextFeatured } : r));
-        toast.success(nextFeatured ? "Review featured" : "Review un-featured");
+        toast.success(nextFeatured ? "Review featured" : "Review un-featured", { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      setReviews(reviews.map(r => r.id === id ? { ...r, featured: nextFeatured } : r));
-      toast.success(nextFeatured ? "Mock: Review featured" : "Mock: Review un-featured");
+    } catch (error: any) {
+      console.error("Toggle review featured error:", error);
+      toast.error(error.message || "Failed to toggle featured state", { id: toastId });
     }
   };
 
   const handleDeleteReview = async (id: string) => {
     if (!confirm("Are you sure you want to delete this review?")) return;
+    const toastId = toast.loading("Deleting review...");
     try {
       const res = await fetch(`/api/reviews?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
       if (res.ok) {
         setReviews(reviews.filter(r => r.id !== id));
-        toast.success("Review deleted successfully");
+        toast.success("Review deleted successfully", { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      setReviews(reviews.filter(r => r.id !== id));
-      toast.success("Mock: Review deleted successfully");
+    } catch (error: any) {
+      console.error("Delete review error:", error);
+      toast.error(error.message || "Failed to delete review", { id: toastId });
     }
   };
 

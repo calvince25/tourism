@@ -18,26 +18,12 @@ export default function CountriesAdminPage() {
         const data = await res.json();
         setCountries(data);
       } else {
-        throw new Error("Failed to fetch");
+        const data = await res.json();
+        throw new Error(data.error || "Failed to fetch countries");
       }
-    } catch (error) {
-      console.warn("DB offline, loading mock countries.");
-      setCountries([
-        {
-          id: "mock-c-1",
-          name: "Kenya",
-          code: "KE",
-          description: "East African country famous for its scenic landscapes and vast wildlife preserves.",
-          isActive: true
-        },
-        {
-          id: "mock-c-2",
-          name: "Tanzania",
-          code: "TZ",
-          description: "Known for its vast wilderness areas, including the plains of Serengeti National Park.",
-          isActive: true
-        }
-      ]);
+    } catch (error: any) {
+      console.error("Fetch countries error:", error);
+      toast.error(error.message || "Failed to load countries");
     } finally {
       setLoading(false);
     }
@@ -50,6 +36,7 @@ export default function CountriesAdminPage() {
   const handleAddCountry = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCountry.name || !newCountry.code) return;
+    const toastId = toast.loading("Adding country...");
 
     try {
       const res = await fetch("/api/countries", {
@@ -57,46 +44,39 @@ export default function CountriesAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCountry),
       });
+      const data = await res.json();
       if (res.ok) {
-        const created = await res.json();
-        setCountries([...countries, created]);
-        toast.success("Country added successfully");
+        setCountries([...countries, data]);
+        toast.success("Country added successfully", { id: toastId });
         setShowAddForm(false);
         setNewCountry({ name: "", code: "", description: "" });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      const mockCreated = {
-        id: `mock-c-${Date.now()}`,
-        name: newCountry.name,
-        code: newCountry.code.toUpperCase(),
-        description: newCountry.description,
-        isActive: true
-      };
-      setCountries([...countries, mockCreated]);
-      toast.success("Mock: Country added successfully (Offline mode)");
-      setShowAddForm(false);
-      setNewCountry({ name: "", code: "", description: "" });
+    } catch (error: any) {
+      console.error("Add country error:", error);
+      toast.error(error.message || "Failed to add country", { id: toastId });
     }
   };
 
   const handleToggleStatus = async (id: string, currentActive: boolean) => {
+    const toastId = toast.loading("Updating status...");
     try {
       const res = await fetch("/api/countries", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, isActive: !currentActive }),
       });
+      const data = await res.json();
       if (res.ok) {
-        setCountries(countries.map(c => c.id === id ? { ...c, isActive: !currentActive } : c));
-        toast.success("Status updated");
+        setCountries(countries.map(c => c.id === id ? { ...c, isActive: !currentActive, active: !currentActive } : c));
+        toast.success("Status updated", { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      setCountries(countries.map(c => c.id === id ? { ...c, isActive: !currentActive } : c));
-      toast.success("Mock: Status updated");
+    } catch (error: any) {
+      console.error("Toggle country status error:", error);
+      toast.error(error.message || "Failed to update status", { id: toastId });
     }
   };
 

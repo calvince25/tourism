@@ -21,7 +21,7 @@ export async function GET(req: Request) {
     });
     return NextResponse.json(posts);
   } catch (error) {
-    return NextResponse.json({ error: "Database offline" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 });
   }
 }
 

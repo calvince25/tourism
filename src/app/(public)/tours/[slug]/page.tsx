@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       include: { ogImage: true }
     });
   } catch (e) {
-    tour = { name: params.slug.charAt(0).toUpperCase() + params.slug.slice(1).replace(/-/g, ' '), slug: params.slug }
+    console.error("Failed to fetch tour metadata:", e);
   }
   if (!tour) return {};
 
@@ -60,33 +60,10 @@ export default async function TourDetailPage({ params }: Props) {
       }
     });
   } catch (e) {
-    tour = {
-      id: "mock-tour",
-      name: params.slug.charAt(0).toUpperCase() + params.slug.slice(1).replace(/-/g, ' '),
-      slug: params.slug,
-      shortDescription: "An unforgettable safari experience.",
-      fullDescription: "<p>Explore the wild beauty of Africa on this curated safari adventure. From dawn game drives to sunset relaxation, every moment is crafted for wonder.</p>",
-      durationDays: 7,
-      durationNights: 6,
-      groupSizeMin: 2,
-      groupSizeMax: 12,
-      difficulty: "MODERATE",
-      travelStyle: "Safari",
-      priceUsd: 2500,
-      highlights: ["Expert Guided Game Drives", "Luxury Tented Camps", "Cultural Visits", "Sunset Sundowners"],
-      included: ["All Accommodation", "Professional Guide", "Park Fees", "Bottled Water"],
-      notIncluded: ["International Flights", "Travel Insurance", "Personal Tips"],
-      status: "PUBLISHED",
-      itinerary: [
-        { id: "d1", dayNumber: 1, title: "Arrival & Welcome", description: "Transfer to your lodge and enjoy a welcome dinner.", location: "Nairobi", accommodation: "Luxury Hotel", mealsIncluded: "Dinner" },
-        { id: "d2", dayNumber: 2, title: "First Safari Day", description: "Venture into the wilderness for your first game drive.", location: "Wilderness", accommodation: "Safari Camp", mealsIncluded: "Breakfast, Lunch, Dinner" },
-      ],
-      faqs: [],
-      gallery: []
-    }
+    console.error("Failed to fetch tour details:", e);
   }
 
-  if (!tour || (tour.status !== "PUBLISHED" && tour.id !== "mock-tour")) notFound();
+  if (!tour || tour.status !== "PUBLISHED") notFound();
 
   const breadcrumbs = [
     { name: "Home", item: "/" },

@@ -30,36 +30,15 @@ export async function POST(req: Request) {
     const cleanSubject = subject ? sanitizeInput(subject) : "General Inquiry";
     const cleanMessage = sanitizeInput(message);
 
-    let submission;
-    try {
-      submission = await prisma.contactSubmission.create({
-        data: {
-          name: cleanName,
-          email: cleanEmail,
-          phone: cleanPhone,
-          destinationInterest: cleanSubject,
-          message: cleanMessage,
-        },
-      });
-    } catch (dbError) {
-      console.warn("Database connection issue. Submission logged in memory:", {
-        cleanName,
-        cleanEmail,
-        cleanPhone,
-        cleanSubject,
-      });
-      // Fallback for visual confirmation/mocking if database is disconnected
-      submission = {
-        id: `mock-cs-${Date.now()}`,
+    const submission = await prisma.contactSubmission.create({
+      data: {
         name: cleanName,
         email: cleanEmail,
         phone: cleanPhone,
         destinationInterest: cleanSubject,
         message: cleanMessage,
-        status: "NEW",
-        createdAt: new Date(),
-      };
-    }
+      },
+    });
 
     return NextResponse.json({ success: true, data: submission });
   } catch (error) {

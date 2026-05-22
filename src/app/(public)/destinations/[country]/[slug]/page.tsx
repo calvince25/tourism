@@ -22,11 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       include: { country: true, ogImage: true }
     })
   } catch (e) {
-    destination = { 
-      name: params.slug.charAt(0).toUpperCase() + params.slug.slice(1).replace(/-/g, ' '), 
-      slug: params.slug,
-      country: { name: params.country.charAt(0).toUpperCase() + params.country.slice(1), slug: params.country }
-    }
+    console.error("Failed to fetch destination metadata:", e);
   }
   if (!destination) return {}
 
@@ -52,22 +48,7 @@ export default async function DestinationDetailPage({ params }: Props) {
       }
     })
   } catch (e) {
-    dest = {
-      id: 'mock-dest',
-      name: params.slug.charAt(0).toUpperCase() + params.slug.slice(1).replace(/-/g, ' '),
-      slug: params.slug,
-      country: { name: params.country.charAt(0).toUpperCase() + params.country.slice(1), slug: params.country },
-      contentIntro: 'Discover the breathtaking beauty and unique wildlife of this incredible destination. Explore savannahs, meet local cultures, and create memories that last a lifetime.',
-      contentWhyVisit: 'Experience the magic of nature and the warmth of the local community.',
-      contentWildlife: 'Home to some of the most iconic animals on the planet.',
-      contentCulture: 'Rich traditions and vibrant local life.',
-      bestSeason: 'June to October',
-      language: 'English / Swahili',
-      currency: 'KES / USD',
-      gallery: [],
-      faqs: [],
-      attractions: []
-    }
+    console.error("Failed to fetch destination details:", e);
   }
 
   if (!dest || dest.country.slug !== params.country) notFound()

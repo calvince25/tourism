@@ -16,30 +16,12 @@ export default function UsersAdminPage() {
         const data = await res.json();
         setUsers(data);
       } else {
-        throw new Error("Failed to fetch");
+        const data = await res.json();
+        throw new Error(data.error || "Failed to fetch users");
       }
-    } catch (error) {
-      console.warn("DB offline, loading mock users.");
-      setUsers([
-        {
-          id: "mock-user-1",
-          name: "Calvince Omondi",
-          email: "omondicalvince4714@gmail.com",
-          role: "SUPER_ADMIN",
-          status: "ACTIVE",
-          phone: "0743990479",
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: "mock-user-2",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "EDITOR",
-          status: "PENDING",
-          phone: "0712345678",
-          createdAt: new Date().toISOString()
-        }
-      ]);
+    } catch (error: any) {
+      console.error("Fetch users error:", error);
+      toast.error(error.message || "Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -50,43 +32,45 @@ export default function UsersAdminPage() {
   }, []);
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
+    const toastId = toast.loading("Updating user status...");
     try {
       const res = await fetch("/api/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
+      const data = await res.json();
       if (res.ok) {
         setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
-        toast.success(`User status updated to ${newStatus}`);
+        toast.success(`User status updated to ${newStatus}`, { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      // Mock update
-      setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
-      toast.success(`Mock: User status updated to ${newStatus}`);
+    } catch (error: any) {
+      console.error("Update user error:", error);
+      toast.error(error.message || "Failed to update user", { id: toastId });
     }
   };
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
+    const toastId = toast.loading("Deleting user...");
     try {
       const res = await fetch("/api/users", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
+      const data = await res.json();
       if (res.ok) {
         setUsers(users.filter(u => u.id !== id));
-        toast.success("User deleted successfully");
+        toast.success("User deleted successfully", { id: toastId });
       } else {
-        throw new Error("API failed");
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      // Mock delete
-      setUsers(users.filter(u => u.id !== id));
-      toast.success("Mock: User deleted successfully");
+    } catch (error: any) {
+      console.error("Delete user error:", error);
+      toast.error(error.message || "Failed to delete user", { id: toastId });
     }
   };
 

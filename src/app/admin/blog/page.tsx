@@ -17,28 +17,12 @@ export default function BlogAdminPage() {
         const data = await res.json();
         setPosts(data);
       } else {
-        throw new Error("Failed to fetch");
+        const data = await res.json();
+        throw new Error(data.error || "Failed to fetch posts");
       }
-    } catch (error) {
-      console.warn("DB offline, loading mock posts.");
-      setPosts([
-        {
-          id: "mock-b-1",
-          title: "The Ultimate Guide to Maasai Mara Safari",
-          slug: "ultimate-guide-maasai-mara-safari",
-          status: "PUBLISHED",
-          publishedAt: new Date().toISOString(),
-          excerpt: "Everything you need to know before visiting Maasai Mara."
-        },
-        {
-          id: "mock-b-2",
-          title: "Top 10 Pack List for African Safari",
-          slug: "top-10-pack-list-african-safari",
-          status: "DRAFT",
-          publishedAt: null,
-          excerpt: "Checklist of essential items to pack for the wild safari."
-        }
-      ]);
+    } catch (error: any) {
+      console.error("Fetch posts error:", error);
+      toast.error(error.message || "Failed to load blog posts");
     } finally {
       setLoading(false);
     }
@@ -50,17 +34,19 @@ export default function BlogAdminPage() {
 
   const handleDeletePost = async (id: string) => {
     if (!confirm("Are you sure you want to delete this blog post?")) return;
+    const toastId = toast.loading("Deleting post...");
     try {
       const res = await fetch(`/api/blog?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setPosts(posts.filter(p => p.id !== id));
-        toast.success("Post deleted successfully");
+        toast.success("Post deleted successfully", { id: toastId });
       } else {
-        throw new Error("API failed");
+        const data = await res.json();
+        throw new Error(data.error || "API failed");
       }
-    } catch (error) {
-      setPosts(posts.filter(p => p.id !== id));
-      toast.success("Mock: Post deleted successfully");
+    } catch (error: any) {
+      console.error("Delete post error:", error);
+      toast.error(error.message || "Failed to delete post", { id: toastId });
     }
   };
 

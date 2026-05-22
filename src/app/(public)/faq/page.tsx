@@ -18,20 +18,8 @@ export default async function FaqPage() {
       orderBy: [{ category: "asc" }, { sortOrder: "asc" }],
     });
   } catch (error) {
-    faqs = [
-      {
-        id: "mock-1",
-        category: "Booking",
-        question: "How far in advance should I book?",
-        answer: "We recommend booking at least 3-6 months in advance, especially for the high season."
-      },
-      {
-        id: "mock-2",
-        category: "Visas",
-        question: "Do I need a visa to visit Kenya?",
-        answer: "Yes, most nationalities require an eTA which must be applied for before travel."
-      }
-    ];
+    console.error("Failed to fetch FAQs from database:", error);
+    faqs = [];
   }
 
   // Group by category

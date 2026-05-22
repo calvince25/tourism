@@ -4,25 +4,15 @@ import Image from "next/image";
 import { Plus, Edit3, Trash2, Globe, MapPin } from "lucide-react";
 
 export default async function DestinationsListPage() {
-  let destinations = [];
+  let destinations: any[] = [];
   try {
     destinations = await prisma.destination.findMany({
       include: { country: true, thumbnailImage: true },
       orderBy: { createdAt: 'desc' }
     });
   } catch (error) {
-    console.error("Database connection failed, loading mock destinations.");
-    destinations = [
-      {
-        id: "mock-dest-1",
-        name: "Maasai Mara National Reserve",
-        slug: "maasai-mara",
-        status: "PUBLISHED",
-        totalWordCount: 1500,
-        country: { name: "Kenya" },
-        thumbnailImage: { fileUrl: "/assets/placeholder.png" }
-      }
-    ];
+    console.error("Database connection failed fetching destinations:", error);
+    destinations = [];
   }
 
   return (
