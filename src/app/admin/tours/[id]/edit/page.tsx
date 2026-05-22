@@ -13,6 +13,18 @@ export default async function EditTourPage({ params }: Props) {
   try {
     tour = await prisma.tour.findUnique({
       where: { id: params.id },
+      include: {
+        coverImage: true,
+        heroImage: true,
+        itinerary: {
+          include: { photo: true },
+          orderBy: { dayNumber: "asc" }
+        },
+        gallery: {
+          include: { media: true },
+          orderBy: { sortOrder: "asc" }
+        }
+      }
     });
   } catch (error) {
     console.error("Database connection failed during edit tour:", error);

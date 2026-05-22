@@ -249,15 +249,19 @@ export default function DestinationForm({ initialData, countries }: { initialDat
                     required
                     className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white focus:border-accent outline-none transition-all"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      const autoSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                      setFormData({ ...formData, name, slug: autoSlug });
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-white/40 uppercase tracking-widest">Slug</label>
+                  <label className="text-sm font-bold text-white/40 uppercase tracking-widest">Slug <span className="text-white/20 font-normal normal-case tracking-normal">(auto-generated)</span></label>
                   <input 
                     type="text" 
                     required
-                    className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white focus:border-accent outline-none transition-all"
+                    className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white/60 focus:border-accent outline-none transition-all"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                   />

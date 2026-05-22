@@ -57,12 +57,13 @@ export function validatePasswordStrength(password: string): { isValid: boolean; 
  * Verifies Cloudflare Turnstile token server-side.
  */
 export async function verifyTurnstileToken(token: string): Promise<boolean> {
-  // If no token is provided, check if we're in development or Turnstile is disabled
+  if ((process.env.NODE_ENV as string) === "development" || process.env.BYPASS_TURNSTILE === "true") {
+    console.warn("Turnstile verification bypassed in development/bypass mode.");
+    return true;
+  }
+
+  // If no token is provided
   if (!token) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Turnstile token missing, bypassing verification in development mode.");
-      return true;
-    }
     return false;
   }
 
@@ -89,6 +90,6 @@ export async function verifyTurnstileToken(token: string): Promise<boolean> {
   } catch (error) {
     console.error("Turnstile verification error:", error);
     // In case of verification server issue, default to true in development
-    return process.env.NODE_ENV === "development";
+    return (process.env.NODE_ENV as string) === "development" || process.env.BYPASS_TURNSTILE === "true";
   }
 }
