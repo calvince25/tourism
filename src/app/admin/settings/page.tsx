@@ -412,7 +412,22 @@ export default function SettingsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { label: "Founder Portrait (Cynthia)", key: "founder_image", defaultVal: "/assets/about-image.png", hint: "Displays on the About page — Founder & Director section." },
+            { 
+              label: "Founder Portrait (Cynthia)", 
+              key: "founder_image", 
+              defaultVal: "/assets/about-image.png", 
+              hint: "Displays on the About page — Founder & Director section.",
+              tag: "About Page",
+              btnLabel: "Upload Founder Photo"
+            },
+            { 
+              label: "About Us Image (Homepage)", 
+              key: "about_us_image", 
+              defaultVal: "/assets/agency_office.png", 
+              hint: "Displays on the Home page — About Us section.",
+              tag: "Home Page",
+              btnLabel: "Upload Section Photo"
+            },
           ].map((profile) => {
             const currentVal = getVal(profile.key) || profile.defaultVal;
             const status = uploadStatus[profile.key];
@@ -426,7 +441,7 @@ export default function SettingsPage() {
                       <h4 className="font-bold text-white">{profile.label}</h4>
                       <p className="text-white/40 text-xs mt-1">{profile.hint}</p>
                     </div>
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-accent bg-accent/10 px-2 py-1 rounded-full shrink-0 ml-2">About Page</span>
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-accent bg-accent/10 px-2 py-1 rounded-full shrink-0 ml-2">{profile.tag}</span>
                   </div>
                   <div className="relative h-48 bg-navy-deep rounded-2xl overflow-hidden border border-white/5 group">
                     <img
@@ -453,7 +468,7 @@ export default function SettingsPage() {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <label className={`flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-accent/10 hover:bg-accent/20 border border-accent/30 rounded-xl cursor-pointer text-sm font-bold text-accent transition-all hover:scale-[1.02] active:scale-95 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <Upload size={16} className="pointer-events-none" />
-                    Upload Founder Photo
+                    {profile.btnLabel}
                     <input
                       type="file"
                       accept="image/*"

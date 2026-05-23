@@ -4,7 +4,11 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShieldCheck, Clock, BadgeDollarSign } from "lucide-react";
 
-export default function AboutUs() {
+interface AboutUsProps {
+  aboutImage?: string;
+}
+
+export default function AboutUs({ aboutImage = "/assets/agency_office.png" }: AboutUsProps) {
   return (
     <section id="about" className="py-16 sm:py-24 bg-navy-dark">
       <div className="container mx-auto px-4 sm:px-8">
@@ -17,7 +21,7 @@ export default function AboutUs() {
             className="relative rounded-[24px] sm:rounded-[40px] overflow-hidden border-4 border-white/10 aspect-video lg:aspect-square w-full"
           >
             <Image 
-              src="/assets/agency_office.png" 
+              src={aboutImage} 
               alt="Our Office" 
               fill 
               className="object-cover"

@@ -26,13 +26,20 @@ export default async function Home() {
   }
 
   let heroImage = "/assets/hero_bg.png";
+  let aboutUsImage = "/assets/agency_office.png";
   try {
-    const heroSetting = await prisma.setting.findUnique({ where: { key: "hero_home" } });
+    const [heroSetting, aboutSetting] = await Promise.all([
+      prisma.setting.findUnique({ where: { key: "hero_home" } }),
+      prisma.setting.findUnique({ where: { key: "about_us_image" } }),
+    ]);
     if (heroSetting?.value) {
       heroImage = heroSetting.value;
     }
+    if (aboutSetting?.value) {
+      aboutUsImage = aboutSetting.value;
+    }
   } catch (error) {
-    console.warn("Failed to fetch home hero setting, using default:", error);
+    console.warn("Failed to fetch page settings, using defaults:", error);
   }
 
   return (
@@ -40,7 +47,7 @@ export default async function Home() {
       <Navbar />
       <Hero heroImage={heroImage} />
       <StatsSection />
-      <AboutUs />
+      <AboutUs aboutImage={aboutUsImage} />
       <Destinations initialCountries={JSON.parse(JSON.stringify(countries))} />
     </main>
   );
