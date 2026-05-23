@@ -198,6 +198,24 @@ export default async function TourDetailPage({ params }: Props) {
                   </div>
                 </div>
               )}
+               {/* Tour Gallery */}
+              {tour.gallery && tour.gallery.length > 0 && (
+                <div className="space-y-8">
+                  <h2 className="text-2xl sm:text-4xl font-bold font-outfit text-white mb-6 sm:mb-8 border-l-4 border-accent pl-4 sm:pl-6">Tour Gallery</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {tour.gallery.map((item: any, i: number) => (
+                      <div key={i} className="relative h-64 rounded-2xl overflow-hidden group border border-white/5">
+                        <Image
+                          src={item.media.fileUrl}
+                          alt={`${tour.name} gallery ${i}`}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Inclusions / Exclusions */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -235,6 +253,17 @@ export default async function TourDetailPage({ params }: Props) {
                   <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                     <Zap size={120} className="text-accent" />
                   </div>
+
+                  {tour.coverImage?.fileUrl && (
+                    <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden border border-white/5 mb-8">
+                      <Image
+                        src={tour.coverImage.fileUrl}
+                        alt={`${tour.name} Cover`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
                   
                   <div className="mb-10">
                     <p className="text-white/40 text-sm font-medium mb-1">Safari Tour Price</p>

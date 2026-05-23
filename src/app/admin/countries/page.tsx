@@ -118,6 +118,28 @@ export default function CountriesAdminPage() {
     }
   };
 
+  const handleDeleteCountry = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete ${name}? This will permanently remove the country.`)) return;
+    const toastId = toast.loading(`Deleting ${name}…`);
+    try {
+      const res = await fetch("/api/countries", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCountries((prev) => prev.filter((c) => c.id !== id));
+        toast.success("Country deleted successfully", { id: toastId });
+      } else {
+        throw new Error(data.error || "Failed to delete country");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete country", { id: toastId });
+    }
+  };
+
+
   return (
     <div className="space-y-10">
       {/* Header */}
@@ -325,6 +347,13 @@ export default function CountriesAdminPage() {
                           title={country.active ? "Deactivate" : "Activate"}
                         >
                           {country.active ? <X size={16} /> : <Check size={16} />}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCountry(country.id, country.name)}
+                          className="p-2 bg-white/5 rounded-lg text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                          title="Delete Country"
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>

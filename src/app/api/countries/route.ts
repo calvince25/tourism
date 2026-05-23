@@ -62,3 +62,33 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Failed to update country" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = await req.json();
+
+    // Check if country has destinations
+    const destinationsCount = await prisma.destination.count({
+      where: { countryId: id }
+    });
+
+    if (destinationsCount > 0) {
+      return NextResponse.json(
+        { error: "Cannot delete country: It has associated destinations. Please delete the destinations first." },
+        { status: 400 }
+      );
+    }
+
+    await prisma.country.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Delete country error:", error);
+    return NextResponse.json({ error: error.message || "Failed to delete country" }, { status: 500 });
+  }
+}

@@ -5,6 +5,14 @@ const nextConfig = {
     // the project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
   async headers() {
     return [
       {

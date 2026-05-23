@@ -199,6 +199,16 @@ export default async function DestinationDetailPage({ params }: Props) {
             {/* Sidebar */}
             <div className="space-y-8">
               <div className="sticky top-32 bg-navy-light/30 border border-accent/20 rounded-3xl p-10 backdrop-blur-xl">
+                {dest.thumbnailImage?.fileUrl && (
+                  <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden border border-white/5 mb-8">
+                    <Image
+                      src={dest.thumbnailImage.fileUrl}
+                      alt={`${dest.name} Cover`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
                 <h3 className="text-2xl font-bold font-outfit mb-6">Plan Your Trip</h3>
                 <p className="text-white/60 text-sm mb-8">
                   Ready to experience {dest.name}? Get a customized safari quote today.
