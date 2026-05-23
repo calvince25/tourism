@@ -1,7 +1,22 @@
 import Link from "next/link";
 import { Facebook, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-export default function Footer() {
+export default async function Footer() {
+  let destinations: any[] = [];
+  try {
+    destinations = await prisma.destination.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { sortOrder: "asc" },
+      take: 6,
+      include: {
+        country: true,
+      },
+    });
+  } catch (error) {
+    console.error("Footer: Failed to fetch top destinations:", error);
+  }
+
   return (
     <footer className="bg-navy-dark text-white/70 py-12 md:py-20 border-t border-white/5">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
@@ -44,12 +59,17 @@ export default function Footer() {
           <div className="space-y-6">
             <h4 className="text-white font-bold font-outfit uppercase tracking-wider text-sm">Top Destinations</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link href="/destinations/kenya/maasai-mara" className="hover:text-accent transition-colors">Maasai Mara</Link></li>
-              <li><Link href="/destinations/kenya/amboseli" className="hover:text-accent transition-colors">Amboseli</Link></li>
-              <li><Link href="/destinations/kenya/diani-beach" className="hover:text-accent transition-colors">Diani Beach</Link></li>
-              <li><Link href="/destinations/kenya/lake-nakuru" className="hover:text-accent transition-colors">Lake Nakuru</Link></li>
-              <li><Link href="/destinations/kenya/lamu" className="hover:text-accent transition-colors">Lamu Island</Link></li>
-              <li><Link href="/destinations/kenya/nairobi" className="hover:text-accent transition-colors">Nairobi</Link></li>
+              {destinations.length > 0 ? (
+                destinations.map((dest) => (
+                  <li key={dest.id}>
+                    <Link href={`/destinations/${dest.country.slug}/${dest.slug}`} className="hover:text-accent transition-colors">
+                      {dest.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="text-white/40 italic">No destinations published</li>
+              )}
             </ul>
           </div>
 

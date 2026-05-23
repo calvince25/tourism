@@ -2,17 +2,17 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = 'https://wildpathafrica.co.ke'
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://wildpathafrica.co.ke'
 
   const staticPages = [
     { url: `${base}/`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 1.0 },
-    { url: `${base}/destinations/`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${base}/tours/`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${base}/about/`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${base}/contact/`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${base}/blog/`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.8 },
-    { url: `${base}/faq/`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${base}/reviews/`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.6 },
+    { url: `${base}/destinations`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
+    { url: `${base}/tours`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
+    { url: `${base}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${base}/contact`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${base}/blog`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.8 },
+    { url: `${base}/faq`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${base}/reviews`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.6 },
   ]
 
   try {
@@ -27,28 +27,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const countries = await prisma.country.findMany({ where: { active: true } })
 
     const countryPages = countries.map(c => ({
-      url: `${base}/destinations/${c.slug}/`,
+      url: `${base}/destinations/${c.slug}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.85,
     }))
 
     const destinationPages = destinations.map(d => ({
-      url: `${base}/destinations/${d.country.slug}/${d.slug}/`,
+      url: `${base}/destinations/${d.country.slug}/${d.slug}`,
       lastModified: d.updatedAt,
       changeFrequency: 'weekly' as const,
       priority: 0.9,
     }))
 
     const tourPages = tours.map(t => ({
-      url: `${base}/tours/${t.slug}/`,
+      url: `${base}/tours/${t.slug}`,
       lastModified: t.updatedAt,
       changeFrequency: 'weekly' as const,
       priority: 0.85,
     }))
 
     const blogPages = posts.map(p => ({
-      url: `${base}/blog/${p.slug}/`,
+      url: `${base}/blog/${p.slug}`,
       lastModified: p.updatedAt,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
