@@ -3,9 +3,9 @@ import { Facebook, Instagram, Twitter, MessageCircle } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-navy-dark text-white/70 py-20 border-t border-white/5">
-      <div className="container mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+    <footer className="bg-navy-dark text-white/70 py-12 md:py-20 border-t border-white/5">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Column 1: Brand */}
           <div className="space-y-6">
             <div className="text-2xl font-bold font-outfit tracking-tighter text-white">
@@ -15,7 +15,7 @@ export default function Footer() {
               Where Every Path Leads to Wonder. Kenya&apos;s premier safari and tourism company, offering expert-guided wildlife adventures.
             </p>
             <div className="flex items-center gap-4">
-              <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all">
+              <Link href="https://www.facebook.com/share/1CRFai4pXV/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all">
                 <Facebook size={18} />
               </Link>
               <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all">
@@ -80,7 +80,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+        <div className="mt-10 md:mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
           <p>© {new Date().getFullYear()} WildpathAfrica. All rights reserved. Designed by <a href="https://www.growthlab.co.ke" target="_blank" rel="noopener noreferrer" className="hover:text-accent font-bold transition-colors">GrowthLab Limited</a>.</p>
           <div className="flex gap-6">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>

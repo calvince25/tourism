@@ -46,42 +46,42 @@ export default async function ToursIndexPage() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden text-center">
+      <section className="relative min-h-[45vh] flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
         <div 
           id="hero-bg-tours"
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <div className="container mx-auto px-8 relative z-20">
-          <p className="text-accent uppercase tracking-widest font-bold mb-4">Unforgettable Adventures</p>
-          <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">Safari Packages</h1>
-          <p className="text-white/60 max-w-2xl mx-auto text-lg">
+        <div className="container mx-auto px-4 sm:px-8 relative z-20 py-24">
+          <p className="text-accent uppercase tracking-widest font-bold mb-4 text-xs sm:text-sm">Unforgettable Adventures</p>
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-outfit mb-6">Safari Packages</h1>
+          <p className="text-white/60 max-w-2xl mx-auto text-base sm:text-lg">
             Curated wildlife experiences designed to take you deeper into the heart of Africa.
           </p>
         </div>
       </section>
 
       {/* Trust Badges */}
-      <section className="py-12 bg-navy-dark border-b border-white/5">
-        <div className="container mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <section className="py-10 md:py-12 bg-navy-dark border-b border-white/5">
+        <div className="container mx-auto px-4 sm:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10">
             <div className="flex items-center gap-4 justify-center">
-              <ShieldCheck className="text-accent" size={32} />
+              <ShieldCheck className="text-accent shrink-0" size={32} />
               <div className="text-left">
-                <p className="font-bold text-white uppercase tracking-wider text-xs">Safe & Secure</p>
-                <p className="text-white/40 text-[10px]">Fully licensed & insured</p>
+                <p className="font-bold text-white uppercase tracking-wider text-xs">Safe &amp; Secure</p>
+                <p className="text-white/40 text-[10px]">Fully licensed &amp; insured</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 justify-center border-x border-white/5">
-              <Zap className="text-accent" size={32} />
+            <div className="flex items-center gap-4 justify-center sm:border-x sm:border-white/5">
+              <Zap className="text-accent shrink-0" size={32} />
               <div className="text-left">
                 <p className="font-bold text-white uppercase tracking-wider text-xs">Fast Booking</p>
                 <p className="text-white/40 text-[10px]">Instant quote within 24h</p>
               </div>
             </div>
             <div className="flex items-center gap-4 justify-center">
-              <Heart className="text-accent" size={32} />
+              <Heart className="text-accent shrink-0" size={32} />
               <div className="text-left">
                 <p className="font-bold text-white uppercase tracking-wider text-xs">Expert Guides</p>
                 <p className="text-white/40 text-[10px]">Certified KMMG naturalists</p>
@@ -91,14 +91,14 @@ export default async function ToursIndexPage() {
         </div>
       </section>
 
-      <section className="py-24">
-        <div className="container mx-auto px-8">
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4 sm:px-8">
           {tours.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-white/10 rounded-3xl">
               <p className="text-white/40">Our tour curators are designing new adventures. Check back soon!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
               {tours.map((tour) => (
                 <Link 
                   key={tour.id} 

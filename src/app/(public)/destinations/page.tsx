@@ -51,30 +51,30 @@ export default async function DestinationsIndexPage() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden text-center">
+      <section className="relative min-h-[45vh] flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
         <div 
           id="hero-bg-destinations"
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <div className="container mx-auto px-8 relative z-20">
-          <p className="text-accent uppercase tracking-widest font-bold mb-4 animate-fade-in">Explore Africa</p>
-          <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">Our Destinations</h1>
-          <p className="text-white/60 max-w-2xl mx-auto text-lg">
+        <div className="container mx-auto px-4 sm:px-8 relative z-20 py-24">
+          <p className="text-accent uppercase tracking-widest font-bold mb-4 text-xs sm:text-sm animate-fade-in">Explore Africa</p>
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-outfit mb-6">Our Destinations</h1>
+          <p className="text-white/60 max-w-2xl mx-auto text-base sm:text-lg">
             Discover breathtaking landscapes, extraordinary wildlife, and vibrant cultures across the continent.
           </p>
         </div>
       </section>
 
-      <section className="py-24">
-        <div className="container mx-auto px-8">
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4 sm:px-8">
           {countries.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-white/10 rounded-3xl">
               <p className="text-white/40">Our team is mapping out new destinations. Check back soon!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
               {countries.map((country: any) => (
                 <Link 
                   key={country.id} 
@@ -94,12 +94,12 @@ export default async function DestinationsIndexPage() {
                        <span className="text-4xl drop-shadow-md">{country.flagEmoji}</span>
                     </div>
 
-                    <div className="absolute bottom-10 left-8 right-8">
-                      <h3 className="text-5xl font-bold font-outfit text-white mb-3 group-hover:text-accent transition-colors">
+                    <div className="absolute bottom-8 left-6 right-6 sm:bottom-10 sm:left-8 sm:right-8">
+                      <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-outfit text-white mb-2 sm:mb-3 group-hover:text-accent transition-colors">
                         {country.name}
                       </h3>
-                      <div className="flex items-center gap-2 text-white/80 font-medium text-lg">
-                        <MapPin size={20} className="text-accent" />
+                      <div className="flex items-center gap-2 text-white/80 font-medium text-base sm:text-lg">
+                        <MapPin size={18} className="text-accent shrink-0" />
                         <span>{country._count?.destinations || 0} Destinations to explore</span>
                       </div>
                     </div>

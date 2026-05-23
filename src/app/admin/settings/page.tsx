@@ -146,19 +146,23 @@ export default function SettingsPage() {
     }
 
     setUploadStatus(prev => ({ ...prev, [key]: "uploading" }));
+
+    // Use dedicated settings upload endpoint (handles upload + save atomically)
     const formData = new FormData();
-    formData.append("files", fileToUpload);
+    formData.append("file", fileToUpload);
+    formData.append("key", key);
 
     try {
-      const res = await fetch("/api/upload", {
+      const res = await fetch("/api/settings/upload", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      if (res.ok && data.success && data.media.length > 0) {
+      if (res.ok && data.success && data.fileUrl) {
         setUploadStatus(prev => ({ ...prev, [key]: "saving" }));
-        const fileUrl = data.media[0].fileUrl;
-        await handleSave(key, fileUrl);
+        const fileUrl = data.fileUrl;
+        // Sync localStorage
+        try { localStorage.setItem('setting_' + key, fileUrl); } catch (_) {}
         setSettings(prev => {
           const exists = prev.find(s => s.key === key);
           if (exists) {
@@ -167,11 +171,15 @@ export default function SettingsPage() {
             return [...prev, { key, value: fileUrl }];
           }
         });
+        toast.success("Hero image updated successfully!");
       } else {
-        toast.error(data.error || "Upload failed");
+        const msg = data.message || data.error || "Upload failed";
+        toast.error(msg);
+        console.error("Settings upload error response:", data);
       }
     } catch (error) {
-      toast.error("An error occurred during upload");
+      console.error("Settings hero upload exception:", error);
+      toast.error("Network error during upload. Please try again.");
     } finally {
       setUploadStatus(prev => ({ ...prev, [key]: null }));
     }

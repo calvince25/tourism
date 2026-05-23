@@ -60,7 +60,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3 text-white">
             <div className="hidden sm:flex items-center gap-3">
               <Link href="#" className="hover:text-accent transition-colors"><Instagram size={18} /></Link>
-              <Link href="#" className="hover:text-accent transition-colors"><Facebook size={18} /></Link>
+              <Link href="https://www.facebook.com/share/1CRFai4pXV/" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors"><Facebook size={18} /></Link>
               <Link href="#" className="hover:text-accent transition-colors"><Youtube size={18} /></Link>
             </div>
             {/* Hamburger — mobile only */}
@@ -94,7 +94,7 @@ export default function Navbar() {
           {/* Social Icons in mobile menu */}
           <div className="flex items-center gap-6 text-white mt-8">
             <Link href="#" className="hover:text-accent transition-colors"><Instagram size={22} /></Link>
-            <Link href="#" className="hover:text-accent transition-colors"><Facebook size={22} /></Link>
+            <Link href="https://www.facebook.com/share/1CRFai4pXV/" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors"><Facebook size={22} /></Link>
             <Link href="#" className="hover:text-accent transition-colors"><Youtube size={22} /></Link>
           </div>
         </div>

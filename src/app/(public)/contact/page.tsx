@@ -41,24 +41,24 @@ export default async function ContactPage() {
       <JsonLd type="breadcrumb" data={{ items: breadcrumbItems }} />
       <Navbar />
 
-      <section className="relative h-[40vh] flex items-center justify-center overflow-hidden text-center">
+      <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />
         <div 
           id="hero-bg-contact"
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <div className="container mx-auto px-8 relative z-20">
-          <h1 className="text-5xl md:text-7xl font-bold font-outfit mb-6">Contact Us</h1>
-          <p className="text-white/60 max-w-2xl mx-auto text-lg">
+        <div className="container mx-auto px-4 sm:px-8 relative z-20 py-20">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-outfit mb-6">Contact Us</h1>
+          <p className="text-white/60 max-w-2xl mx-auto text-base sm:text-lg">
             Plan your adventure with Kenya&apos;s leading safari experts.
           </p>
         </div>
       </section>
 
-      <section className="py-24">
-        <div className="container mx-auto px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4 sm:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
             {/* Info Side */}
             <div className="space-y-12">
               <div>

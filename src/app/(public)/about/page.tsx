@@ -118,30 +118,30 @@ export default async function AboutPage() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-[60vh] py-20 flex items-center justify-center overflow-hidden text-center">
+      <section className="relative min-h-[55vh] py-24 flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-75 z-10" />
         <div 
           id="hero-bg-about"
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${heroImage}')` }}
         />
-        <div className="container mx-auto px-8 relative z-20 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-8 relative z-20 max-w-5xl">
           <p className="text-accent uppercase tracking-widest font-bold mb-4 text-xs sm:text-sm">
             About WildpathAfrica: Kenya&apos;s Boutique Safari Company
           </p>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold font-outfit mb-8 leading-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-outfit mb-8 leading-tight">
             We are a small team with a deep love for this land.
           </h1>
-          <p className="text-white/80 max-w-2xl mx-auto text-lg sm:text-xl md:text-2xl font-light leading-relaxed">
+          <p className="text-white/80 max-w-2xl mx-auto text-base sm:text-lg md:text-xl font-light leading-relaxed">
             Everything we do is built around one belief: that Kenya deserves to be experienced properly.
           </p>
         </div>
       </section>
 
       {/* Who We Are */}
-      <section className="py-24 border-b border-white/5">
-        <div className="container mx-auto px-8 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-16 md:py-24 border-b border-white/5">
+        <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className="space-y-8">
               <span className="text-accent uppercase tracking-widest font-bold text-sm block">Who We Are</span>
               <h2 className="text-3xl sm:text-5xl font-bold font-outfit leading-tight">
@@ -180,9 +180,9 @@ export default async function AboutPage() {
       </section>
 
       {/* How It Was Born (Cynthia's Story) */}
-      <section className="py-24 bg-navy-dark border-b border-white/5">
-        <div className="container mx-auto px-8 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+      <section className="py-16 md:py-24 bg-navy-dark border-b border-white/5">
+        <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-5 relative">
               <div className="aspect-[4/5] bg-navy-light/20 rounded-[40px] overflow-hidden border border-white/5 relative group">
                 <img 
