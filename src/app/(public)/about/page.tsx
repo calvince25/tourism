@@ -97,19 +97,21 @@ export default async function AboutPage() {
   ];
 
   let heroImage = "/assets/hero_bg.png";
+  let founderImage = "/assets/about-image.png";
   try {
-    const dbPromise = prisma.setting.findUnique({
-      where: { key: "hero_about" }
-    });
-    const timeoutPromise = new Promise<any>((_, reject) => 
-      setTimeout(() => reject(new Error("Timeout")), 2000)
-    );
-    const heroSetting = await Promise.race([dbPromise, timeoutPromise]);
-    if (heroSetting?.value) {
-      heroImage = heroSetting.value;
-    }
+    const [heroSetting, founderSetting] = await Promise.race([
+      Promise.all([
+        prisma.setting.findUnique({ where: { key: "hero_about" } }),
+        prisma.setting.findUnique({ where: { key: "founder_image" } }),
+      ]),
+      new Promise<any>((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), 2000)
+      ),
+    ]);
+    if (heroSetting?.value) heroImage = heroSetting.value;
+    if (founderSetting?.value) founderImage = founderSetting.value;
   } catch (error) {
-    console.warn("Failed to fetch hero image setting:", error);
+    console.warn("Failed to fetch image settings:", error);
   }
 
   return (
@@ -186,7 +188,7 @@ export default async function AboutPage() {
             <div className="lg:col-span-5 relative">
               <div className="aspect-[4/5] bg-navy-light/20 rounded-[40px] overflow-hidden border border-white/5 relative group">
                 <img 
-                  src="/assets/about-image.png" 
+                  src={founderImage} 
                   alt="WildpathAfrica Founder Cynthia" 
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
                 />

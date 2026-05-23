@@ -398,6 +398,91 @@ export default function SettingsPage() {
           })}
         </div>
       </div>
+
+      {/* Profile & Team Images */}
+      <div className="bg-navy-light/20 border border-white/5 rounded-3xl sm:rounded-[40px] p-5 sm:p-8 lg:p-10 space-y-6 sm:space-y-8">
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold font-outfit flex items-center gap-3 text-white">
+            <Upload className="text-accent" size={24} /> Profile &amp; Team Images
+          </h3>
+          <p className="text-white/40 text-sm mt-1">
+            Upload portrait and profile photos displayed across the site, such as the Founder section on the About page.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { label: "Founder Portrait (Cynthia)", key: "founder_image", defaultVal: "/assets/about-image.png", hint: "Displays on the About page — Founder & Director section." },
+          ].map((profile) => {
+            const currentVal = getVal(profile.key) || profile.defaultVal;
+            const status = uploadStatus[profile.key];
+            const isUploading = !!status;
+
+            return (
+              <div key={profile.key} className="bg-navy border border-accent/20 rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-4 hover:border-accent/40 transition-all">
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 className="font-bold text-white">{profile.label}</h4>
+                      <p className="text-white/40 text-xs mt-1">{profile.hint}</p>
+                    </div>
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-accent bg-accent/10 px-2 py-1 rounded-full shrink-0 ml-2">About Page</span>
+                  </div>
+                  <div className="relative h-48 bg-navy-deep rounded-2xl overflow-hidden border border-white/5 group">
+                    <img
+                      src={currentVal}
+                      alt={profile.label}
+                      className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {isUploading && (
+                      <div className="absolute inset-0 bg-navy/90 flex flex-col items-center justify-center p-4 text-center">
+                        <div className="relative flex items-center justify-center mb-2">
+                          <Loader2 className="text-accent animate-spin" size={28} />
+                          <div className="absolute w-12 h-12 rounded-full border border-accent/20 animate-ping opacity-70"></div>
+                        </div>
+                        <span className="text-xs font-semibold text-white uppercase tracking-wider animate-pulse">
+                          {status === "compressing" && "Optimizing..."}
+                          {status === "uploading" && "Uploading..."}
+                          {status === "saving" && "Saving..."}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <label className={`flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-accent/10 hover:bg-accent/20 border border-accent/30 rounded-xl cursor-pointer text-sm font-bold text-accent transition-all hover:scale-[1.02] active:scale-95 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <Upload size={16} className="pointer-events-none" />
+                    Upload Founder Photo
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          handleHeroUpload(profile.key, e.target.files[0]);
+                          e.target.value = "";
+                        }
+                      }}
+                      disabled={isUploading}
+                    />
+                  </label>
+                  {getVal(profile.key) && (
+                    <button
+                      onClick={() => handleResetHero(profile.key)}
+                      className="flex items-center justify-center gap-2 sm:p-3 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl transition-all hover:scale-105 text-sm font-bold sm:font-normal shrink-0"
+                      title="Reset to default"
+                    >
+                      <X size={16} />
+                      <span className="sm:hidden">Reset to default</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
