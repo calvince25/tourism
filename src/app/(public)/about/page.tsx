@@ -190,7 +190,7 @@ export default async function AboutPage() {
                 <img 
                   src={founderImage} 
                   alt="WildpathAfrica Founder Cynthia" 
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                  className="w-full h-full object-cover transition-all duration-700 scale-105 group-hover:scale-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-dark via-transparent to-transparent opacity-80" />
                 <div className="absolute bottom-8 left-8 right-8">
