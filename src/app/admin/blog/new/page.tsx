@@ -6,6 +6,7 @@ import Link from "next/link";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { ArrowLeft, Save, Upload, X } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { compressImage } from "@/lib/image";
 
 export default function NewBlogPostPage() {
   const router = useRouter();
@@ -27,10 +28,11 @@ export default function NewBlogPostPage() {
     // Reset so the same file can be re-selected after removal
     e.target.value = "";
 
-    const toastId = toast.loading("Uploading cover image...");
+    const toastId = toast.loading("Optimizing & uploading cover image...");
     try {
+      const compressed = await compressImage(file);
       const uploadData = new FormData();
-      uploadData.append("files", file);
+      uploadData.append("files", compressed);
 
       const res = await fetch("/api/upload", {
         method: "POST",

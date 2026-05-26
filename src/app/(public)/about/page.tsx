@@ -227,7 +227,7 @@ export default async function AboutPage() {
 
       {/* What We Do & Where We Take You */}
       <section className="py-24 border-b border-white/5">
-        <div className="container mx-auto px-8 max-w-7xl">
+        <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <span className="text-accent uppercase tracking-widest font-bold text-sm block mb-4">Our Experiences</span>
             <h2 className="text-3xl sm:text-5xl font-bold font-outfit mb-6">What We Do and Where We Take You</h2>
@@ -251,7 +251,7 @@ export default async function AboutPage() {
                   <h3 className="text-2xl font-bold font-outfit mb-4 group-hover:text-accent transition-colors">
                     {offering.title}
                   </h3>
-                  <p className="text-white/60 leading-relaxed text-base sm:text-lg">
+                  <p className="text-white/60 leading-relaxed text-base">
                     {offering.desc}
                   </p>
                 </div>
@@ -263,7 +263,7 @@ export default async function AboutPage() {
 
       {/* Why We Are Proudly Boutique */}
       <section className="py-24 bg-navy-deep border-b border-white/5">
-        <div className="container mx-auto px-8 max-w-5xl text-center">
+        <div className="container mx-auto px-4 sm:px-8 max-w-5xl text-center">
           <span className="text-accent uppercase tracking-widest font-bold text-sm block mb-4">The Boutique Difference</span>
           <h2 className="text-3xl sm:text-5xl font-bold font-outfit mb-8">Why We Are Proudly Boutique</h2>
           <div className="space-y-6 text-white/70 text-lg sm:text-xl leading-relaxed font-light max-w-4xl mx-auto">
@@ -282,7 +282,7 @@ export default async function AboutPage() {
 
       {/* Our Values */}
       <section className="py-24 bg-navy-dark border-b border-white/5">
-        <div className="container mx-auto px-8 max-w-7xl">
+        <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <span className="text-accent uppercase tracking-widest font-bold text-sm block mb-4">Our Values</span>
             <h2 className="text-3xl sm:text-5xl font-bold font-outfit mb-6">The Values WildpathAfrica Stands By</h2>
@@ -317,8 +317,8 @@ export default async function AboutPage() {
 
       {/* This Is Just the Beginning CTA */}
       <section className="py-24">
-        <div className="container mx-auto px-8 max-w-7xl">
-          <div className="bg-gradient-to-br from-navy-light/30 via-navy-deep to-navy-dark border border-white/5 rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
+          <div className="bg-gradient-to-br from-navy-light/30 via-navy-deep to-navy-dark border border-white/5 rounded-[40px] p-6 sm:p-12 md:p-20 text-center relative overflow-hidden">
             <div className="absolute top-0 left-0 w-96 h-96 bg-accent/5 rounded-full filter blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full filter blur-3xl pointer-events-none" />
             

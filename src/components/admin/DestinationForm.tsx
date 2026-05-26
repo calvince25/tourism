@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import RichTextEditor from "./RichTextEditor";
 import WordCounter from "./WordCounter";
 import { Save, Globe, Info, Search, Image as ImageIcon, HelpCircle, MapPin, Plus, Trash2, Upload } from "lucide-react";
+import { compressImage } from "@/lib/image";
 
 const tabs = [
   { id: "basic", name: "Basic Info", icon: Info },
@@ -69,10 +70,11 @@ export default function DestinationForm({ initialData, countries }: { initialDat
   const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const toastId = toast.loading("Uploading hero image...");
+    const toastId = toast.loading("Optimizing & uploading hero image...");
     try {
+      const compressed = await compressImage(file);
       const uData = new FormData();
-      uData.append("files", file);
+      uData.append("files", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: uData });
       if (res.ok) {
         const data = await res.json();
@@ -93,10 +95,11 @@ export default function DestinationForm({ initialData, countries }: { initialDat
   const handleThumbUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const toastId = toast.loading("Uploading thumbnail...");
+    const toastId = toast.loading("Optimizing & uploading thumbnail...");
     try {
+      const compressed = await compressImage(file);
       const uData = new FormData();
-      uData.append("files", file);
+      uData.append("files", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: uData });
       if (res.ok) {
         const data = await res.json();
@@ -139,10 +142,11 @@ export default function DestinationForm({ initialData, countries }: { initialDat
   };
 
   const handleAttractionPhotoUpload = async (index: number, file: File) => {
-    const toastId = toast.loading("Uploading attraction photo...");
+    const toastId = toast.loading("Optimizing & uploading attraction photo...");
     try {
+      const compressed = await compressImage(file);
       const uData = new FormData();
-      uData.append("files", file);
+      uData.append("files", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: uData });
       if (res.ok) {
         const data = await res.json();

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Plus, Trash2, Globe, Check, X, Upload, Image as ImageIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { compressImage } from "@/lib/image";
 
 const CONTINENTS = ["Africa", "Asia", "Europe", "North America", "South America", "Oceania", "Antarctica"];
 
@@ -46,10 +47,11 @@ export default function CountriesAdminPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const toastId = toast.loading("Uploading cover image…");
+    const toastId = toast.loading("Optimizing & uploading cover image...");
     try {
+      const compressed = await compressImage(file);
       const fd = new FormData();
-      fd.append("files", file);
+      fd.append("files", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (res.ok && data.media?.[0]) {

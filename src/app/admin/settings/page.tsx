@@ -3,71 +3,8 @@
 import { useState, useEffect } from "react";
 import { Save, Globe, MessageCircle, Mail, Phone, Share2, Upload, X, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { compressImage } from "@/lib/image";
 
-// Canvas-based image compression function to convert to high-quality WebP before upload
-const compressImage = (file: File, maxWidth = 1920, maxHeight = 1920, quality = 0.8): Promise<File> => {
-  return new Promise((resolve) => {
-    // Only compress images
-    if (!file.type.startsWith("image/")) {
-      return resolve(file);
-    }
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-
-        // Resize keeping aspect ratio
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          return resolve(file); // Fallback to original
-        }
-
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Export to WebP
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) {
-              return resolve(file);
-            }
-            // Create a new File object with a .webp extension
-            const originalName = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
-            const compressedFile = new File([blob], `${originalName}.webp`, {
-              type: "image/webp",
-              lastModified: Date.now(),
-            });
-            resolve(compressedFile);
-          },
-          "image/webp",
-          quality
-        );
-      };
-      img.onerror = () => resolve(file);
-    };
-    reader.onerror = () => resolve(file);
-  });
-};
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<any[]>([]);
@@ -305,6 +242,63 @@ export default function SettingsPage() {
                 />
                 <button 
                   onClick={() => handleSave('social_instagram', getVal('social_instagram'))}
+                  className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
+                >
+                  <Save size={18} />
+                  <span>Save</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-white/40">TikTok URL</label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input 
+                  type="text" 
+                  className="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
+                  value={getVal('social_tiktok')}
+                  onChange={(e) => updateLocalVal('social_tiktok', e.target.value)}
+                />
+                <button 
+                  onClick={() => handleSave('social_tiktok', getVal('social_tiktok'))}
+                  className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
+                >
+                  <Save size={18} />
+                  <span>Save</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-white/40">Facebook URL</label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input 
+                  type="text" 
+                  className="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
+                  value={getVal('social_facebook')}
+                  onChange={(e) => updateLocalVal('social_facebook', e.target.value)}
+                />
+                <button 
+                  onClick={() => handleSave('social_facebook', getVal('social_facebook'))}
+                  className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
+                >
+                  <Save size={18} />
+                  <span>Save</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-white/40">YouTube URL</label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input 
+                  type="text" 
+                  className="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm sm:text-base"
+                  value={getVal('social_youtube')}
+                  onChange={(e) => updateLocalVal('social_youtube', e.target.value)}
+                />
+                <button 
+                  onClick={() => handleSave('social_youtube', getVal('social_youtube'))}
                   className="w-full sm:w-auto px-6 py-3 bg-accent text-navy rounded-xl hover:scale-[1.03] transition-all flex items-center justify-center gap-2 shrink-0 font-bold text-sm"
                 >
                   <Save size={18} />

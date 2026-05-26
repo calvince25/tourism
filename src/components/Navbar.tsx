@@ -4,6 +4,23 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Instagram, Facebook, Youtube, Menu, X } from "lucide-react";
 
+const Tiktok = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
+
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
@@ -17,12 +34,71 @@ const navLinks = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [socials, setSocials] = useState({
+    instagram: "https://www.instagram.com/wildpathafrica?igsh=d25qYWs1cjI5Y3Fo",
+    facebook: "https://www.facebook.com/share/1CRFai4pXV/",
+    tiktok: "tiktok.com/@wildpathafrica",
+    youtube: "",
+  });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Try to load from localStorage first
+    try {
+      const ig = localStorage.getItem("setting_social_instagram");
+      const fb = localStorage.getItem("setting_social_facebook");
+      const tt = localStorage.getItem("setting_social_tiktok");
+      const yt = localStorage.getItem("setting_social_youtube");
+      if (ig || fb || tt || yt) {
+        setSocials(prev => ({
+          instagram: ig || prev.instagram,
+          facebook: fb || prev.facebook,
+          tiktok: tt || prev.tiktok,
+          youtube: yt || prev.youtube,
+        }));
+      }
+    } catch (_) {}
+
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const ig = data.find(s => s.key === "social_instagram")?.value;
+          const fb = data.find(s => s.key === "social_facebook")?.value;
+          const tt = data.find(s => s.key === "social_tiktok")?.value;
+          const yt = data.find(s => s.key === "social_youtube")?.value;
+          setSocials(prev => ({
+            instagram: ig || prev.instagram,
+            facebook: fb || prev.facebook,
+            tiktok: tt || prev.tiktok,
+            youtube: yt || prev.youtube,
+          }));
+          try {
+            if (ig) localStorage.setItem("setting_social_instagram", ig);
+            if (fb) localStorage.setItem("setting_social_facebook", fb);
+            if (tt) localStorage.setItem("setting_social_tiktok", tt);
+            if (yt) localStorage.setItem("setting_social_youtube", yt);
+          } catch (_) {}
+        }
+      })
+      .catch(err => console.warn("Navbar socials fetch failed:", err));
+  }, []);
+
+  const formatUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `https://${url}`;
+  };
+
+  const fbUrl = formatUrl(socials.facebook);
+  const igUrl = formatUrl(socials.instagram);
+  const ttUrl = formatUrl(socials.tiktok);
+  const ytUrl = formatUrl(socials.youtube);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -59,9 +135,10 @@ export default function Navbar() {
           {/* Desktop Social + Mobile Hamburger */}
           <div className="flex items-center gap-3 text-white">
             <div className="hidden sm:flex items-center gap-3">
-              <Link href="#" className="hover:text-accent transition-colors"><Instagram size={18} /></Link>
-              <Link href="https://www.facebook.com/share/1CRFai4pXV/" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors"><Facebook size={18} /></Link>
-              <Link href="#" className="hover:text-accent transition-colors"><Youtube size={18} /></Link>
+              {igUrl && <Link href={igUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="Instagram"><Instagram size={18} /></Link>}
+              {fbUrl && <Link href={fbUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="Facebook"><Facebook size={18} /></Link>}
+              {ttUrl && <Link href={ttUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="TikTok"><Tiktok size={18} /></Link>}
+              {ytUrl && <Link href={ytUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="YouTube"><Youtube size={18} /></Link>}
             </div>
             {/* Hamburger — mobile only */}
             <button
@@ -93,9 +170,10 @@ export default function Navbar() {
 
           {/* Social Icons in mobile menu */}
           <div className="flex items-center gap-6 text-white mt-8">
-            <Link href="#" className="hover:text-accent transition-colors"><Instagram size={22} /></Link>
-            <Link href="https://www.facebook.com/share/1CRFai4pXV/" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors"><Facebook size={22} /></Link>
-            <Link href="#" className="hover:text-accent transition-colors"><Youtube size={22} /></Link>
+            {igUrl && <Link href={igUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="Instagram"><Instagram size={22} /></Link>}
+            {fbUrl && <Link href={fbUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="Facebook"><Facebook size={22} /></Link>}
+            {ttUrl && <Link href={ttUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="TikTok"><Tiktok size={22} /></Link>}
+            {ytUrl && <Link href={ytUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="YouTube"><Youtube size={22} /></Link>}
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Upload, X, Check, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { compressImage } from "@/lib/image";
 
 interface MediaUploaderProps {
   onUploadComplete?: (media: any[]) => void;
@@ -18,12 +19,15 @@ export default function MediaUploader({ onUploadComplete, multiple = true }: Med
     if (!files.length) return;
     
     setUploading(true);
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i]);
-    }
-
     try {
+      const compressedFiles = await Promise.all(
+        Array.from(files).map(file => compressImage(file))
+      );
+      const formData = new FormData();
+      for (let i = 0; i < compressedFiles.length; i++) {
+        formData.append("files", compressedFiles[i]);
+      }
+
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,

@@ -97,7 +97,7 @@ export default async function TourDetailPage({ params }: Props) {
           className="object-cover"
           priority
         />
-        <div className="container mx-auto px-8 relative z-20">
+        <div className="container mx-auto px-4 sm:px-8 relative z-20">
           <div className="max-w-4xl">
             <Link 
               href="/tours"
@@ -105,11 +105,11 @@ export default async function TourDetailPage({ params }: Props) {
             >
               <ArrowLeft size={16} /> All Safari Tours
             </Link>
-            <h1 className="text-5xl md:text-8xl font-bold font-outfit mb-8 leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-8xl font-bold font-outfit mb-8 leading-tight">
               {tour.name}
             </h1>
             
-            <div className="flex flex-wrap gap-10">
+            <div className="flex flex-wrap gap-4 sm:gap-10">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-accent">
                   <Clock size={24} />
@@ -171,15 +171,15 @@ export default async function TourDetailPage({ params }: Props) {
               {/* Itinerary */}
               {tour.itinerary.length > 0 && (
                 <div className="space-y-12">
-                  <h2 className="text-4xl font-bold font-outfit">Detailed Itinerary</h2>
-                  <div className="space-y-8 relative before:absolute before:left-8 before:top-4 before:bottom-4 before:w-px before:bg-white/5">
+                  <h2 className="text-2xl sm:text-4xl font-bold font-outfit">Detailed Itinerary</h2>
+                  <div className="space-y-8 relative before:absolute before:left-6 sm:before:left-8 before:top-4 before:bottom-4 before:w-px before:bg-white/5">
                     {tour.itinerary.map((day: any) => (
-                      <div key={day.id} className="relative pl-24 group">
-                        <div className="absolute left-0 top-0 w-16 h-16 rounded-2xl bg-navy-light flex flex-col items-center justify-center border border-white/10 group-hover:border-accent transition-colors z-20">
-                          <span className="text-[10px] font-bold uppercase text-white/40">Day</span>
-                          <span className="text-2xl font-bold text-accent">{day.dayNumber}</span>
+                      <div key={day.id} className="relative pl-16 sm:pl-24 group">
+                        <div className="absolute left-0 top-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-navy-light flex flex-col items-center justify-center border border-white/10 group-hover:border-accent transition-colors z-20">
+                          <span className="text-[8px] sm:text-[10px] font-bold uppercase text-white/40 leading-none mb-0.5 sm:mb-1">Day</span>
+                          <span className="text-lg sm:text-2xl font-bold text-accent leading-none">{day.dayNumber}</span>
                         </div>
-                        <div className="bg-navy-light/10 border border-white/5 rounded-3xl p-8 hover:border-white/10 transition-all">
+                        <div className="bg-navy-light/10 border border-white/5 rounded-3xl p-5 sm:p-8 hover:border-white/10 transition-all">
                           <h4 className="text-2xl font-bold font-outfit mb-4">{day.title}</h4>
                           <div className="flex flex-wrap gap-6 text-xs font-bold uppercase tracking-widest text-white/40 mb-6">
                             <span className="flex items-center gap-2"><MapPin size={14} className="text-accent" /> {day.location}</span>
@@ -219,7 +219,7 @@ export default async function TourDetailPage({ params }: Props) {
 
               {/* Inclusions / Exclusions */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-green-500/5 border border-green-500/10 rounded-3xl p-10">
+                <div className="bg-green-500/5 border border-green-500/10 rounded-3xl p-6 sm:p-10">
                   <h4 className="text-xl font-bold mb-6 flex items-center gap-3 text-green-400">
                     <CheckCircle2 size={24} /> What&apos;s Included
                   </h4>
@@ -231,7 +231,7 @@ export default async function TourDetailPage({ params }: Props) {
                     ))}
                   </ul>
                 </div>
-                <div className="bg-red-500/5 border border-red-500/10 rounded-3xl p-10">
+                <div className="bg-red-500/5 border border-red-500/10 rounded-3xl p-6 sm:p-10">
                   <h4 className="text-xl font-bold mb-6 flex items-center gap-3 text-red-400">
                     <XCircle size={24} /> Not Included
                   </h4>

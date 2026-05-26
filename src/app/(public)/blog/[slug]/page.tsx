@@ -65,7 +65,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
             className="object-cover"
             priority
           />
-          <div className="container mx-auto px-8 relative z-20">
+          <div className="container mx-auto px-4 sm:px-8 relative z-20">
             <div className="max-w-4xl">
               <Link 
                 href="/blog"
@@ -76,10 +76,10 @@ export default async function BlogPostDetailPage({ params }: Props) {
               <span className="block bg-accent text-navy text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full w-fit mb-6">
                 {post.category || "Safari Guide"}
               </span>
-              <h1 className="text-5xl md:text-7xl font-bold font-outfit mb-8 leading-tight">
+              <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold font-outfit mb-8 leading-tight">
                 {post.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-8 text-sm text-white/60">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-sm text-white/60">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center font-bold text-accent border border-accent/20">
                     {post.author?.name?.charAt(0) || "W"}
@@ -104,7 +104,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
         </header>
 
         {/* Content Section */}
-        <div className="container mx-auto px-8 pt-20">
+        <div className="container mx-auto px-4 sm:px-8 pt-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
             {/* Sidebar / Sharing */}
             <div className="lg:col-span-1 hidden lg:block sticky top-32 h-fit">
@@ -120,7 +120,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
             {/* Main Content */}
             <div className="lg:col-span-8">
               <div 
-                className="prose prose-invert prose-xl max-w-none prose-headings:font-outfit prose-accent prose-p:leading-relaxed prose-p:text-white/70"
+                className="prose prose-invert prose-base sm:prose-lg md:prose-xl max-w-none prose-headings:font-outfit prose-accent prose-p:leading-relaxed prose-p:text-white/70"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 
@@ -165,11 +165,11 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
       {/* Newsletter Section */}
       <section className="bg-navy-dark py-24 border-t border-white/5">
-        <div className="container mx-auto px-8">
-          <div className="max-w-4xl mx-auto bg-accent rounded-[50px] p-12 md:p-20 text-center text-navy relative overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-8">
+          <div className="max-w-4xl mx-auto bg-accent rounded-[32px] sm:rounded-[50px] p-6 sm:p-12 md:p-20 text-center text-navy relative overflow-hidden">
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-6xl font-bold font-outfit mb-6">Stay in the Wild Loop</h2>
-              <p className="text-navy/70 text-lg mb-10 max-w-xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold font-outfit mb-6">Stay in the Wild Loop</h2>
+              <p className="text-navy/70 text-base sm:text-lg mb-10 max-w-xl mx-auto">
                 Get monthly safari tips, exclusive deals, and wildlife stories delivered straight to your inbox.
               </p>
               <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">

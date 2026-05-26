@@ -1,6 +1,23 @@
 import Link from "next/link";
-import { Facebook, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Youtube, MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+
+const Tiktok = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 export default async function Footer() {
   let destinations: any[] = [];
@@ -17,6 +34,33 @@ export default async function Footer() {
     console.error("Footer: Failed to fetch top destinations:", error);
   }
 
+  let settings: any[] = [];
+  try {
+    settings = await prisma.setting.findMany();
+  } catch (error) {
+    console.error("Footer: Failed to fetch settings:", error);
+  }
+
+  const getSetting = (key: string, defaultValue: string) => {
+    return settings.find(s => s.key === key)?.value || defaultValue;
+  };
+
+  const facebookLink = getSetting("social_facebook", "https://www.facebook.com/share/1CRFai4pXV/");
+  const instagramLink = getSetting("social_instagram", "https://www.instagram.com/wildpathafrica?igsh=d25qYWs1cjI5Y3Fo");
+  const tiktokLink = getSetting("social_tiktok", "tiktok.com/@wildpathafrica");
+  const youtubeLink = getSetting("social_youtube", "");
+
+  const formatUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `https://${url}`;
+  };
+
+  const fbUrl = formatUrl(facebookLink);
+  const igUrl = formatUrl(instagramLink);
+  const ttUrl = formatUrl(tiktokLink);
+  const ytUrl = formatUrl(youtubeLink);
+
   return (
     <footer className="bg-navy-dark text-white/70 py-12 md:py-20 border-t border-white/5">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
@@ -30,15 +74,26 @@ export default async function Footer() {
               Where Every Path Leads to Wonder. Kenya&apos;s premier safari and tourism company, offering expert-guided wildlife adventures.
             </p>
             <div className="flex items-center gap-4">
-              <Link href="https://www.facebook.com/share/1CRFai4pXV/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all">
-                <Facebook size={18} />
-              </Link>
-              <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all">
-                <Instagram size={18} />
-              </Link>
-              <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all">
-                <Twitter size={18} />
-              </Link>
+              {fbUrl && (
+                <Link href={fbUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all" title="Facebook">
+                  <Facebook size={18} />
+                </Link>
+              )}
+              {igUrl && (
+                <Link href={igUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all" title="Instagram">
+                  <Instagram size={18} />
+                </Link>
+              )}
+              {ttUrl && (
+                <Link href={ttUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all" title="TikTok">
+                  <Tiktok size={18} />
+                </Link>
+              )}
+              {ytUrl && (
+                <Link href={ytUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-accent hover:text-navy transition-all" title="YouTube">
+                  <Youtube size={18} />
+                </Link>
+              )}
             </div>
           </div>
 

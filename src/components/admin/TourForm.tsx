@@ -18,6 +18,7 @@ import {
   ArrowDown,
   Users
 } from "lucide-react";
+import { compressImage } from "@/lib/image";
 
 const tabs = [
   { id: "basic", name: "Basic Info", icon: Info },
@@ -68,10 +69,11 @@ export default function TourForm({ initialData }: { initialData?: any }) {
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const toastId = toast.loading("Uploading cover image...");
+    const toastId = toast.loading("Optimizing & uploading cover image...");
     try {
+      const compressed = await compressImage(file);
       const uData = new FormData();
-      uData.append("files", file);
+      uData.append("files", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: uData });
       if (res.ok) {
         const data = await res.json();
@@ -92,10 +94,11 @@ export default function TourForm({ initialData }: { initialData?: any }) {
   const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const toastId = toast.loading("Uploading hero image...");
+    const toastId = toast.loading("Optimizing & uploading hero image...");
     try {
+      const compressed = await compressImage(file);
       const uData = new FormData();
-      uData.append("files", file);
+      uData.append("files", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: uData });
       if (res.ok) {
         const data = await res.json();
@@ -116,11 +119,14 @@ export default function TourForm({ initialData }: { initialData?: any }) {
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    const toastId = toast.loading(`Uploading ${files.length} gallery image(s)...`);
+    const toastId = toast.loading(`Optimizing & uploading ${files.length} gallery image(s)...`);
     try {
+      const compressedFiles = await Promise.all(
+        Array.from(files).map(file => compressImage(file))
+      );
       const uData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        uData.append("files", files[i]);
+      for (let i = 0; i < compressedFiles.length; i++) {
+        uData.append("files", compressedFiles[i]);
       }
       const res = await fetch("/api/upload", { method: "POST", body: uData });
       if (res.ok) {
@@ -177,10 +183,11 @@ export default function TourForm({ initialData }: { initialData?: any }) {
   };
 
   const handleItineraryPhotoUpload = async (index: number, file: File) => {
-    const toastId = toast.loading("Uploading day photo...");
+    const toastId = toast.loading("Optimizing & uploading day photo...");
     try {
+      const compressed = await compressImage(file);
       const uData = new FormData();
-      uData.append("files", file);
+      uData.append("files", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: uData });
       if (res.ok) {
         const data = await res.json();

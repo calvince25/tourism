@@ -87,7 +87,7 @@ export default async function DestinationDetailPage({ params }: Props) {
           priority
           className="object-cover"
         />
-        <div className="container mx-auto px-8 relative z-20">
+        <div className="container mx-auto px-4 sm:px-8 relative z-20">
           <div className="max-w-3xl">
             <FadeIn>
               <p className="text-accent uppercase tracking-widest font-bold mb-4">
@@ -95,7 +95,7 @@ export default async function DestinationDetailPage({ params }: Props) {
               </p>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <h1 className="text-7xl md:text-8xl font-bold font-outfit mb-8 leading-tight">
+              <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold font-outfit mb-8 leading-tight">
                 {dest.name}
               </h1>
             </FadeIn>
@@ -120,9 +120,9 @@ export default async function DestinationDetailPage({ params }: Props) {
       </section>
 
       {/* Content Grid */}
-      <section className="py-24">
-        <div className="container mx-auto px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+      <section className="py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16">
             <div className="lg:col-span-2 space-y-16">
               {/* Introduction */}
               <div className="prose prose-invert max-w-none">
@@ -135,7 +135,7 @@ export default async function DestinationDetailPage({ params }: Props) {
               </div>
 
               {/* Why Visit */}
-              <div className="bg-navy-light/20 rounded-3xl p-10 border border-white/5">
+              <div className="bg-navy-light/20 rounded-3xl p-6 sm:p-10 border border-white/5">
                 <h2 className="text-3xl font-bold font-outfit mb-8">Why Visit {dest.name}?</h2>
                 <div className="text-white/70 leading-relaxed">
                   {dest.contentWhyVisit}
@@ -198,7 +198,7 @@ export default async function DestinationDetailPage({ params }: Props) {
 
             {/* Sidebar */}
             <div className="space-y-8">
-              <div className="sticky top-32 bg-navy-light/30 border border-accent/20 rounded-3xl p-10 backdrop-blur-xl">
+              <div className="sticky top-32 bg-navy-light/30 border border-accent/20 rounded-3xl p-6 sm:p-10 backdrop-blur-xl">
                 {dest.thumbnailImage?.fileUrl && (
                   <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden border border-white/5 mb-8">
                     <Image

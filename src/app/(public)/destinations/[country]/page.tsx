@@ -73,9 +73,9 @@ export default async function CountryDestinationsPage({ params }: Props) {
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: `url('${coverUrl}')` }}
         />
-        <div className="container mx-auto px-8 relative z-20 text-center">
+        <div className="container mx-auto px-4 sm:px-8 relative z-20 text-center">
           <p className="text-accent uppercase tracking-widest font-bold mb-4 animate-fade-in">Experience the Magic of</p>
-          <h1 className="text-6xl md:text-8xl font-bold font-outfit mb-6">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold font-outfit mb-6">
             {country.flagEmoji} {country.name}
           </h1>
           <nav className="flex items-center justify-center gap-3 text-sm text-white/60 font-medium">
@@ -90,7 +90,7 @@ export default async function CountryDestinationsPage({ params }: Props) {
 
       {/* Main Grid */}
       <section className="py-24">
-        <div className="container mx-auto px-8">
+        <div className="container mx-auto px-4 sm:px-8">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
             <div className="max-w-2xl">
               <h2 className="text-4xl font-bold mb-4">Discover {country.name}</h2>
