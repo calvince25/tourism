@@ -128,3 +128,29 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: error.message || 'Update failed' }, { status: 500 })
   }
 }
+
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'Missing tour id' }, { status: 400 })
+
+    // Clean up dependent tables without cascade in DB schema
+    await prisma.review.deleteMany({
+      where: { tourId: id }
+    })
+
+    // TourDestination, TourItineraryDay, TourDeparture, TourGallery, and TourFaq are configured with onDelete: Cascade
+    const deletedTour = await prisma.tour.delete({
+      where: { id }
+    })
+
+    return NextResponse.json(deletedTour)
+  } catch (error: any) {
+    console.error("API Error deleting tour:", error)
+    return NextResponse.json({ error: error.message || 'Deletion failed' }, { status: 500 })
+  }
+}

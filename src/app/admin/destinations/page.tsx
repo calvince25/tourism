@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Edit3, Trash2, Globe, MapPin } from "lucide-react";
+import { Plus, Edit3, Globe, MapPin } from "lucide-react";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 export default async function DestinationsListPage() {
   let destinations: any[] = [];
@@ -87,9 +88,7 @@ export default async function DestinationsListPage() {
                     >
                       <Edit3 size={18} />
                     </Link>
-                    <button className="p-2 bg-white/5 rounded-lg text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all">
-                      <Trash2 size={18} />
-                    </button>
+                    <DeleteButton id={dest.id} type="destinations" name={dest.name} />
                   </div>
                 </td>
               </tr>

@@ -91,3 +91,33 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: error.message || 'Update failed' }, { status: 500 })
   }
 }
+
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'Missing destination id' }, { status: 400 })
+
+    // Clean up dependent tables without cascade in DB schema
+    await prisma.tourDestination.deleteMany({
+      where: { destinationId: id }
+    })
+
+    await prisma.review.deleteMany({
+      where: { destinationId: id }
+    })
+
+    // Attractions, DestinationGallery, and DestinationFaq are configured with onDelete: Cascade in prisma schema
+    const deletedDestination = await prisma.destination.delete({
+      where: { id }
+    })
+
+    return NextResponse.json(deletedDestination)
+  } catch (error: any) {
+    console.error("API Error deleting destination:", error)
+    return NextResponse.json({ error: error.message || 'Deletion failed' }, { status: 500 })
+  }
+}
