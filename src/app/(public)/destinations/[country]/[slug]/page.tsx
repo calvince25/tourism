@@ -119,6 +119,39 @@ export default async function DestinationDetailPage({ params }: Props) {
         </div>
       </section>
 
+      {/* Destination Overview Section */}
+      <section className="py-12 bg-navy-light/10 border-y border-white/5">
+        <div className="container mx-auto px-4 sm:px-8">
+          <h2 className="text-3xl font-bold font-outfit mb-8 text-left">Destination Overview</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+              <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Best Time</span>
+              <span className="text-base sm:text-lg font-bold text-accent mt-2">{dest.bestSeason || "All Year"}</span>
+            </div>
+            <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+              <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Language</span>
+              <span className="text-base sm:text-lg font-bold text-white mt-2">{dest.language || "English / Swahili"}</span>
+            </div>
+            <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+              <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Currency</span>
+              <span className="text-base sm:text-lg font-bold text-white mt-2">{dest.currency || "KES / USD"}</span>
+            </div>
+            <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+              <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Visa Info</span>
+              <span className={`text-base sm:text-lg font-bold mt-2 ${dest.visaRequired ? "text-accent" : "text-green-400"}`}>
+                {dest.visaRequired ? "Required" : "Not Required"}
+              </span>
+            </div>
+            <div className="col-span-2 md:col-span-1 bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+              <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Park Fees (Res / Non-Res)</span>
+              <span className="text-sm font-bold text-white mt-2">
+                {dest.parkEntryResident || "Free"} / {dest.parkEntryNonResident || "Free"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Content Grid */}
       <section className="py-12 sm:py-24">
         <div className="container mx-auto px-4 sm:px-8">
@@ -127,41 +160,87 @@ export default async function DestinationDetailPage({ params }: Props) {
               {/* Introduction */}
               <div className="prose prose-invert max-w-none">
                 <h2 className="text-4xl font-bold font-outfit text-white mb-8 border-l-4 border-accent pl-6">Introduction</h2>
-                <div className="text-white/70 text-lg leading-relaxed space-y-6">
-                  {dest.contentIntro?.split('\n').map((p: string, i: number) => (
-                    <p key={i}>{p}</p>
-                  ))}
-                </div>
+                <div 
+                  className="text-white/70"
+                  dangerouslySetInnerHTML={{ __html: dest.contentIntro || "" }}
+                />
               </div>
 
               {/* Why Visit */}
-              <div className="bg-navy-light/20 rounded-3xl p-6 sm:p-10 border border-white/5">
-                <h2 className="text-3xl font-bold font-outfit mb-8">Why Visit {dest.name}?</h2>
-                <div className="text-white/70 leading-relaxed">
-                  {dest.contentWhyVisit}
-                </div>
+              <div className="bg-navy-light/20 rounded-3xl p-6 sm:p-10 border border-white/5 prose prose-invert max-w-none">
+                <h2 className="text-3xl font-bold font-outfit mb-8 text-white">Why Visit {dest.name}?</h2>
+                <div 
+                  className="text-white/70"
+                  dangerouslySetInnerHTML={{ __html: dest.contentWhyVisit || "" }}
+                />
               </div>
 
-              {/* Wildlife & Culture Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-navy-light/20 rounded-3xl p-8 border border-white/5">
-                  <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
-                    <Zap size={20} className="text-accent" /> Wildlife
-                  </h3>
-                  <p className="text-white/60 text-sm leading-relaxed">{dest.contentWildlife}</p>
+              {/* Wildlife & Nature */}
+              {dest.contentWildlife && (
+                <div className="prose prose-invert max-w-none">
+                  <h2 className="text-3xl font-bold font-outfit text-white mb-6 border-l-4 border-accent pl-6 flex items-center gap-3">
+                    <Zap size={24} className="text-accent" /> Wildlife & Nature
+                  </h2>
+                  <div 
+                    className="text-white/70"
+                    dangerouslySetInnerHTML={{ __html: dest.contentWildlife }}
+                  />
                 </div>
-                <div className="bg-navy-light/20 rounded-3xl p-8 border border-white/5">
-                  <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
-                    <TrendingUp size={20} className="text-accent" /> Culture
-                  </h3>
-                  <p className="text-white/60 text-sm leading-relaxed">{dest.contentCulture}</p>
+              )}
+
+              {/* Culture & Community */}
+              {dest.contentCulture && (
+                <div className="prose prose-invert max-w-none">
+                  <h2 className="text-3xl font-bold font-outfit text-white mb-6 border-l-4 border-accent pl-6 flex items-center gap-3">
+                    <TrendingUp size={24} className="text-accent" /> Culture & Community
+                  </h2>
+                  <div 
+                    className="text-white/70"
+                    dangerouslySetInnerHTML={{ __html: dest.contentCulture }}
+                  />
                 </div>
-              </div>
+              )}
+
+              {/* Attractions */}
+              {dest.attractions && dest.attractions.length > 0 && (
+                <div className="space-y-8">
+                  <h2 className="text-3xl font-bold font-outfit text-white mb-8 border-l-4 border-accent pl-6">
+                    Attractions & Highlights
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {dest.attractions.map((attr: any) => (
+                      <div key={attr.id} className="bg-navy-light/20 border border-white/5 rounded-3xl overflow-hidden flex flex-col group">
+                        {attr.photo?.fileUrl && (
+                          <div className="relative aspect-video w-full overflow-hidden bg-navy">
+                            <Image 
+                              src={attr.photo.fileUrl} 
+                              alt={attr.name} 
+                              fill 
+                              className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                            />
+                          </div>
+                        )}
+                        <div className="p-6 space-y-3 flex-grow flex flex-col justify-between">
+                          <div>
+                            {attr.attractionType && (
+                              <span className="text-[10px] text-accent font-bold uppercase tracking-widest">
+                                {attr.attractionType}
+                              </span>
+                            )}
+                            <h3 className="text-xl font-bold text-white mt-1">{attr.name}</h3>
+                            <p className="text-white/60 text-sm mt-3 leading-relaxed">{attr.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Gallery */}
               {dest.gallery.length > 0 && (
                 <div>
-                  <h2 className="text-3xl font-bold font-outfit mb-8">Destination Gallery</h2>
+                  <h2 className="text-3xl font-bold font-outfit mb-8 border-l-4 border-accent pl-6 text-white">Destination Gallery</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {dest.gallery.map((item: any, i: number) => (
                       <div key={i} className="relative h-64 rounded-2xl overflow-hidden group">
@@ -180,7 +259,7 @@ export default async function DestinationDetailPage({ params }: Props) {
               {/* FAQs */}
               {dest.faqs.length > 0 && (
                 <div className="space-y-8">
-                  <h2 className="text-3xl font-bold font-outfit">Frequently Asked Questions</h2>
+                  <h2 className="text-3xl font-bold font-outfit border-l-4 border-accent pl-6 text-white">Frequently Asked Questions</h2>
                   <div className="space-y-4">
                     {dest.faqs.map((faq: any, i: number) => (
                       <details key={i} className="group bg-navy-light/10 border border-white/5 rounded-2xl p-6">
