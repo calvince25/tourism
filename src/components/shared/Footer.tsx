@@ -34,6 +34,20 @@ export default async function Footer() {
     console.error("Footer: Failed to fetch top destinations:", error);
   }
 
+  let tours: any[] = [];
+  try {
+    tours = await prisma.tour.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: [
+        { featured: "desc" },
+        { name: "asc" }
+      ],
+      take: 6,
+    });
+  } catch (error) {
+    console.error("Footer: Failed to fetch top tours:", error);
+  }
+
   let settings: any[] = [];
   try {
     settings = await prisma.setting.findMany();
@@ -64,7 +78,7 @@ export default async function Footer() {
   return (
     <footer className="bg-navy-dark text-white/70 py-12 md:py-20 border-t border-white/5">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 md:gap-12">
           {/* Column 1: Brand */}
           <div className="space-y-6">
             <div className="text-2xl font-bold font-outfit tracking-tighter text-white">
@@ -128,7 +142,25 @@ export default async function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Contact */}
+          {/* Column 4: Top Tours */}
+          <div className="space-y-6">
+            <h4 className="text-white font-bold font-outfit uppercase tracking-wider text-sm">Top Tours</h4>
+            <ul className="space-y-4 text-sm">
+              {tours.length > 0 ? (
+                tours.map((tour) => (
+                  <li key={tour.id}>
+                    <Link href={`/tours/${tour.slug}`} className="hover:text-accent transition-colors">
+                      {tour.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="text-white/40 italic">No tours published</li>
+              )}
+            </ul>
+          </div>
+
+          {/* Column 5: Contact */}
           <div className="space-y-6">
             <h4 className="text-white font-bold font-outfit uppercase tracking-wider text-sm">Contact Us</h4>
             <ul className="space-y-4 text-sm">
