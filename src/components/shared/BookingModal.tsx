@@ -89,21 +89,27 @@ export default function BookingModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-navy-dark/80 backdrop-blur-md" onClick={onClose} />
+      <div className="absolute inset-0 bg-navy-dark/80 backdrop-blur-md" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Box */}
-      <div className="relative w-full sm:max-w-2xl bg-navy-light/90 sm:bg-navy-light/90 border-0 sm:border border-white/10 rounded-t-[28px] sm:rounded-[32px] overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl">
+      <div 
+        className="relative w-full sm:max-w-2xl bg-navy-light/90 sm:bg-navy-light/90 border-0 sm:border border-white/10 rounded-t-[28px] sm:rounded-[32px] overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-white/5 bg-navy-dark/40">
           <div>
-            <h3 className="text-lg sm:text-xl font-bold font-outfit text-white">Request a Quote</h3>
+            <h3 id="modal-title" className="text-lg sm:text-xl font-bold font-outfit text-white">Request a Quote</h3>
             <p className="text-xs text-white/50">Inquiry for: <span className="text-accent font-bold">{itemName}</span></p>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close modal"
             className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center text-white/60 hover:bg-white/5 hover:text-white transition-colors"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -111,20 +117,24 @@ export default function BookingModal({
         <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Full Name *</label>
+              <label htmlFor="booking-name" className="text-[10px] font-bold uppercase tracking-widest text-white/40">Full Name *</label>
               <input
+                id="booking-name"
                 type="text"
                 required
+                aria-required="true"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Email Address *</label>
+              <label htmlFor="booking-email" className="text-[10px] font-bold uppercase tracking-widest text-white/40">Email Address *</label>
               <input
+                id="booking-email"
                 type="email"
                 required
+                aria-required="true"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -134,8 +144,9 @@ export default function BookingModal({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Phone Number</label>
+              <label htmlFor="booking-phone" className="text-[10px] font-bold uppercase tracking-widest text-white/40">Phone Number</label>
               <input
+                id="booking-phone"
                 type="tel"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm"
                 value={formData.phone}
@@ -143,8 +154,9 @@ export default function BookingModal({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">WhatsApp Number</label>
+              <label htmlFor="booking-whatsapp" className="text-[10px] font-bold uppercase tracking-widest text-white/40">WhatsApp Number</label>
               <input
+                id="booking-whatsapp"
                 type="tel"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm"
                 value={formData.whatsapp}
@@ -155,10 +167,11 @@ export default function BookingModal({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
-                <Calendar size={12} className="text-accent" /> Travel Date
+              <label htmlFor="booking-date" className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
+                <Calendar size={12} className="text-accent" aria-hidden="true" /> Travel Date
               </label>
               <input
+                id="booking-date"
                 type="date"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm appearance-none"
                 value={formData.travelDate}
@@ -166,26 +179,30 @@ export default function BookingModal({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
-                <Users size={12} className="text-accent" /> Adults
+              <label htmlFor="booking-adults" className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
+                <Users size={12} className="text-accent" aria-hidden="true" /> Adults
               </label>
               <input
+                id="booking-adults"
                 type="number"
                 min="1"
                 required
+                aria-required="true"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm"
                 value={formData.travelersAdults}
                 onChange={(e) => setFormData({ ...formData, travelersAdults: parseInt(e.target.value) || 1 })}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
-                <Users size={12} className="text-accent" /> Children
+              <label htmlFor="booking-children" className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
+                <Users size={12} className="text-accent" aria-hidden="true" /> Children
               </label>
               <input
+                id="booking-children"
                 type="number"
                 min="0"
                 required
+                aria-required="true"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm"
                 value={formData.travelersChildren}
                 onChange={(e) => setFormData({ ...formData, travelersChildren: parseInt(e.target.value) || 0 })}
@@ -195,10 +212,11 @@ export default function BookingModal({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
-                <DollarSign size={12} className="text-accent" /> Budget Range (USD)
+              <label htmlFor="booking-budget" className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
+                <DollarSign size={12} className="text-accent" aria-hidden="true" /> Budget Range (USD)
               </label>
               <select
+                id="booking-budget"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm appearance-none"
                 value={formData.budgetRange}
                 onChange={(e) => setFormData({ ...formData, budgetRange: e.target.value })}
@@ -211,8 +229,9 @@ export default function BookingModal({
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Accommodation</label>
+              <label htmlFor="booking-accom" className="text-[10px] font-bold uppercase tracking-widest text-white/40">Accommodation</label>
               <select
+                id="booking-accom"
                 className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm appearance-none"
                 value={formData.accommodationPref}
                 onChange={(e) => setFormData({ ...formData, accommodationPref: e.target.value })}
@@ -225,8 +244,9 @@ export default function BookingModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Special Requirements & Interests</label>
+            <label htmlFor="booking-requirements" className="text-[10px] font-bold uppercase tracking-widest text-white/40">Special Requirements & Interests</label>
             <textarea
+              id="booking-requirements"
               className="w-full bg-navy/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-sm h-24 resize-none"
               placeholder="E.g. dietary requirements, single room occupancy, targeted wildlife species..."
               value={formData.specialRequirements}
@@ -241,7 +261,7 @@ export default function BookingModal({
             disabled={loading}
             className="w-full bg-accent text-navy font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
           >
-            {loading ? "Submitting Inquiry..." : <><Send size={16} /> Send Booking Inquiry</>}
+            {loading ? "Submitting Inquiry..." : <><Send size={16} aria-hidden="true" /> Send Booking Inquiry</>}
           </button>
         </form>
       </div>

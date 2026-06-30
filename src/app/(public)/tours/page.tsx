@@ -4,13 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock, DollarSign, Users, ArrowRight, ShieldCheck, Zap, Heart } from "lucide-react";
 import type { Metadata } from "next";
+import { generateSEOMetadata } from "@/lib/seo";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
-export const metadata: Metadata = {
-  title: "Safari Tour Packages | Kenya Wildlife Tours | WildpathAfrica",
+export const metadata: Metadata = generateSEOMetadata({
+  title: "Safari Tour Packages | Kenya Wildlife Tours",
   description: "Browse our curated selection of safari tour packages in Kenya. From Maasai Mara migrations to Amboseli elephant walks.",
-};
+  path: "/tours",
+});
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function ToursIndexPage() {
   let tours: any[] = [];
@@ -44,6 +47,7 @@ export default async function ToursIndexPage() {
   return (
     <div className="min-h-screen bg-navy">
       <Navbar />
+      <Breadcrumbs items={[{ name: "Tours", href: "/tours" }]} />
 
       {/* Hero */}
       <section className="relative min-h-[45vh] flex items-center justify-center overflow-hidden text-center">

@@ -5,7 +5,7 @@ import AboutUs from "@/components/AboutUs";
 import Destinations from "@/components/Destinations";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function Home() {
   let countries: any[] = [];

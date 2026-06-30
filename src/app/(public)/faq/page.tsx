@@ -2,13 +2,17 @@ import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import { HelpCircle, ChevronDown } from "lucide-react";
 import type { Metadata } from "next";
+import { generateSEOMetadata } from "@/lib/seo";
+import JsonLd from "@/components/shared/JsonLd";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions | WildpathAfrica",
+export const metadata: Metadata = generateSEOMetadata({
+  title: "Frequently Asked Questions",
   description: "Find answers to common questions about booking safaris, payments, visas, and safety with WildpathAfrica.",
-};
+  path: "/faq",
+});
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function FaqPage() {
   let faqs: any[] = [];
@@ -50,6 +54,8 @@ export default async function FaqPage() {
   return (
     <div className="min-h-screen bg-navy">
       <Navbar />
+      <Breadcrumbs items={[{ name: "FAQ", href: "/faq" }]} />
+      {faqs.length > 0 && <JsonLd type="faq" data={{ faqs: faqs.map((f: any) => ({ question: f.question, answer: f.answer })) }} />}
 
       <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden text-center py-16 md:py-24">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />

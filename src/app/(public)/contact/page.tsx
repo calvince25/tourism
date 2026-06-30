@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
 import ContactForm from "@/components/ContactForm";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "Contact Us - Safari Consultants & Guides",
@@ -12,7 +13,7 @@ export const metadata: Metadata = generateSEOMetadata({
   path: "/contact",
 });
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function ContactPage() {
   const breadcrumbItems = [
@@ -38,8 +39,9 @@ export default async function ContactPage() {
 
   return (
     <div className="min-h-screen bg-navy">
-      <JsonLd type="breadcrumb" data={{ items: breadcrumbItems }} />
       <Navbar />
+      <Breadcrumbs items={[{ name: "Contact Us", href: "/contact" }]} />
+      <JsonLd type="contactPage" />
 
       <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden text-center">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />

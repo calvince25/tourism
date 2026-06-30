@@ -5,27 +5,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, User, Clock, Share2, Facebook, Twitter, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import { generateSEOMetadata } from "@/lib/seo";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
+import JsonLd from "@/components/shared/JsonLd";
 
 interface Props { params: { slug: string } }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  try {
+    const posts = await prisma.blogPost.findMany({ where: { status: "PUBLISHED" }, select: { slug: true } });
+    return posts.map((p: any) => ({ slug: p.slug }));
+  } catch { return []; }
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await prisma.blogPost.findUnique({
     where: { slug: params.slug },
-    include: { ogImage: true }
+    include: { ogImage: true, author: true }
   });
   if (!post) return {};
 
-  return {
+  return generateSEOMetadata({
     title: post.metaTitle || `${post.title} | WildpathAfrica Blog`,
     description: post.metaDescription || post.excerpt || "",
-    openGraph: {
-      title: post.metaTitle || post.title,
-      description: post.metaDescription || post.excerpt || "",
-      images: post.ogImage ? [{ url: post.ogImage.fileUrl }] : [],
-    },
-  };
+    path: `/blog/${post.slug}`,
+    ogImage: post.ogImage?.fileUrl,
+    type: "article",
+    publishedTime: post.publishedAt?.toISOString(),
+    modifiedTime: post.updatedAt?.toISOString(),
+    authors: post.author?.name ? [post.author.name] : undefined,
+  });
 }
 
 export default async function BlogPostDetailPage({ params }: Props) {
@@ -53,6 +64,20 @@ export default async function BlogPostDetailPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-navy text-white">
       <Navbar />
+      <Breadcrumbs items={[
+        { name: "Blog", href: "/blog" },
+        { name: post.title, href: `/blog/${post.slug}` }
+      ]} />
+      <JsonLd type="blogPosting" data={{
+        title: post.title,
+        description: post.excerpt || "",
+        url: `/blog/${post.slug}`,
+        image: post.featuredImage?.fileUrl,
+        datePublished: post.publishedAt?.toISOString(),
+        dateModified: post.updatedAt?.toISOString(),
+        authorName: post.author?.name,
+        category: post.category || undefined
+      }} />
 
       <article className="pb-24">
         {/* Post Hero */}

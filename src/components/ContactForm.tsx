@@ -71,24 +71,28 @@ export default function ContactForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-widest text-white/40">
+            <label htmlFor="contact-name" className="text-xs font-bold uppercase tracking-widest text-white/40">
               Full Name
             </label>
             <input
+              id="contact-name"
               type="text"
               required
+              aria-required="true"
               className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white focus:border-accent outline-none"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-widest text-white/40">
+            <label htmlFor="contact-email" className="text-xs font-bold uppercase tracking-widest text-white/40">
               Email Address
             </label>
             <input
+              id="contact-email"
               type="email"
               required
+              aria-required="true"
               className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white focus:border-accent outline-none"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -98,10 +102,11 @@ export default function ContactForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-widest text-white/40">
+            <label htmlFor="contact-phone" className="text-xs font-bold uppercase tracking-widest text-white/40">
               Phone Number
             </label>
             <input
+              id="contact-phone"
               type="tel"
               className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white focus:border-accent outline-none"
               value={formData.phone}
@@ -109,10 +114,11 @@ export default function ContactForm() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-widest text-white/40">
+            <label htmlFor="contact-subject" className="text-xs font-bold uppercase tracking-widest text-white/40">
               Subject
             </label>
             <select
+              id="contact-subject"
               className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white focus:border-accent outline-none appearance-none"
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -137,11 +143,13 @@ export default function ContactForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-widest text-white/40">
+          <label htmlFor="contact-message" className="text-xs font-bold uppercase tracking-widest text-white/40">
             Message
           </label>
           <textarea
+            id="contact-message"
             required
+            aria-required="true"
             className="w-full bg-navy border border-white/10 rounded-xl px-6 py-4 text-white focus:border-accent outline-none h-40 resize-none"
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}

@@ -9,10 +9,21 @@ import { Calendar, MapPin, Clock, Globe, Shield, Zap, TrendingUp } from 'lucide-
 import { generateSEOMetadata } from '@/lib/seo'
 import JsonLd from '@/components/shared/JsonLd'
 import BookingButton from '@/components/shared/BookingButton'
+import Breadcrumbs from '@/components/shared/Breadcrumbs'
 
 interface Props { params: { country: string; slug: string } }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  try {
+    const destinations = await prisma.destination.findMany({ 
+      where: { status: 'PUBLISHED' }, 
+      include: { country: true } 
+    });
+    return destinations.map((d: any) => ({ country: d.country.slug, slug: d.slug }));
+  } catch { return []; }
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let destination: any = null;
@@ -61,21 +72,26 @@ export default async function DestinationDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-navy text-white">
-      <JsonLd type="breadcrumb" data={{ items: breadcrumbs }} />
+      <Navbar />
+      <Breadcrumbs items={[
+        { name: "Destinations", href: "/destinations" },
+        { name: dest.country.name, href: `/destinations/${dest.country.slug}` },
+        { name: dest.name, href: `/destinations/${dest.country.slug}/${dest.slug}` },
+      ]} />
       <JsonLd 
-        type="localBusiness" 
+        type="touristDestination" 
         data={{
           name: dest.name,
           description: dest.contentIntro || "African tourism destination.",
-          url: `https://wildpathafrica.co.ke/destinations/${dest.country.slug}/${dest.slug}`,
-          addressLocality: dest.name,
-          addressCountry: "KE"
+          url: `/destinations/${dest.country.slug}/${dest.slug}`,
+          image: dest.heroImage?.fileUrl,
+          country: dest.country.name,
+          bestSeason: dest.bestSeason
         }} 
       />
       {dest.faqs && dest.faqs.length > 0 && (
         <JsonLd type="faq" data={{ faqs: dest.faqs }} />
       )}
-      <Navbar />
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center overflow-hidden">

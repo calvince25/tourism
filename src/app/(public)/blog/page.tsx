@@ -2,13 +2,16 @@ import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/blog/BlogCard";
 import type { Metadata } from "next";
+import { generateSEOMetadata } from "@/lib/seo";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
-export const metadata: Metadata = {
-  title: "Safari Blog | Travel Guides & Wildlife Stories | WildpathAfrica",
+export const metadata: Metadata = generateSEOMetadata({
+  title: "Safari Blog | Travel Guides & Wildlife Stories",
   description: "Stay updated with the latest safari tips, wildlife news, and travel guides from the heart of Africa.",
-};
+  path: "/blog",
+});
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function BlogIndexPage() {
   let posts: any[] = [];
@@ -48,6 +51,7 @@ export default async function BlogIndexPage() {
   return (
     <div className="min-h-screen bg-navy">
       <Navbar />
+      <Breadcrumbs items={[{ name: "Blog", href: "/blog" }]} />
 
       <section className="relative min-h-[45vh] flex items-center justify-center overflow-hidden py-16 md:py-24">
         <div className="absolute inset-0 bg-navy-dark opacity-60 z-10" />

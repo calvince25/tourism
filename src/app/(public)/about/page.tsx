@@ -19,6 +19,7 @@ import {
 import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "About Us | Our Story and Values",
@@ -26,7 +27,7 @@ export const metadata: Metadata = generateSEOMetadata({
   path: "/about",
 });
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const values = [
   { 
@@ -92,8 +93,7 @@ const offerings = [
 
 export default async function AboutPage() {
   const breadcrumbItems = [
-    { name: "Home", item: "/" },
-    { name: "About Us", item: "/about" },
+    { name: "About Us", href: "/about" },
   ];
 
   let heroImage = "/assets/hero_bg.png";
@@ -116,8 +116,8 @@ export default async function AboutPage() {
 
   return (
     <div className="min-h-screen bg-navy text-white">
-      <JsonLd type="breadcrumb" data={{ items: breadcrumbItems }} />
       <Navbar />
+      <Breadcrumbs items={breadcrumbItems} />
 
       {/* Hero */}
       <section className="relative min-h-[55vh] py-24 flex items-center justify-center overflow-hidden text-center">

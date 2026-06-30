@@ -4,13 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import type { Metadata } from "next";
+import { generateSEOMetadata } from "@/lib/seo";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
-export const metadata: Metadata = {
-  title: "Destinations in Africa | WildpathAfrica",
+export const metadata: Metadata = generateSEOMetadata({
+  title: "Destinations in Africa | Safari Destinations",
   description: "Explore the most breathtaking destinations across Africa. Discover Kenya, Tanzania, Uganda, and more.",
-};
+  path: "/destinations",
+});
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function DestinationsIndexPage() {
   let countries: any[] = [];
@@ -49,6 +52,7 @@ export default async function DestinationsIndexPage() {
   return (
     <div className="min-h-screen bg-navy">
       <Navbar />
+      <Breadcrumbs items={[{ name: "Destinations", href: "/destinations" }]} />
 
       {/* Hero */}
       <section className="relative min-h-[45vh] flex items-center justify-center overflow-hidden text-center">

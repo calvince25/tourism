@@ -20,10 +20,18 @@ import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
 import BookingButton from "@/components/shared/BookingButton";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
 interface Props { params: { slug: string } }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  try {
+    const tours = await prisma.tour.findMany({ where: { status: "PUBLISHED" }, select: { slug: true } });
+    return tours.map((t: any) => ({ slug: t.slug }));
+  } catch { return []; }
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let tour: any = null;
@@ -73,19 +81,27 @@ export default async function TourDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-navy text-white">
-      <JsonLd type="breadcrumb" data={{ items: breadcrumbs }} />
+      <Navbar />
+      <Breadcrumbs items={[
+        { name: "Tours", href: "/tours" },
+        { name: tour.name, href: `/tours/${tour.slug}` },
+      ]} />
       <JsonLd 
-        type="service" 
+        type="touristTrip" 
         data={{ 
           name: tour.name, 
           description: tour.shortDescription || "Safari tour package.", 
-          serviceType: "Safari Tour" 
+          url: `/tours/${tour.slug}`,
+          image: tour.coverImage?.fileUrl,
+          priceUsd: tour.priceUsd,
+          durationDays: tour.durationDays,
+          difficulty: tour.difficulty,
+          highlights: tour.highlights
         }} 
       />
       {tour.faqs && tour.faqs.length > 0 && (
         <JsonLd type="faq" data={{ faqs: tour.faqs }} />
       )}
-      <Navbar />
 
       {/* Hero */}
       <section className="relative h-[80vh] flex items-end pb-24 overflow-hidden">

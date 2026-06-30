@@ -3,10 +3,20 @@ import { notFound } from 'next/navigation'
 import DestinationCard from '@/components/destinations/DestinationCard'
 import type { Metadata } from 'next'
 import Navbar from '@/components/Navbar'
+import Link from 'next/link'
+import Breadcrumbs from "@/components/shared/Breadcrumbs"
+import { generateSEOMetadata } from "@/lib/seo"
 
 interface Props { params: { country: string } }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  try {
+    const countries = await prisma.country.findMany({ where: { active: true }, select: { slug: true } });
+    return countries.map((c) => ({ country: c.slug }));
+  } catch { return []; }
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let country: any = null;
@@ -17,16 +27,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   if (!country) return {}
-  return {
-    title: `${country.name} Destinations | WildpathAfrica`,
+  
+  return generateSEOMetadata({
+    title: `${country.name} Destinations | Safari & Travel Packages`,
     description: `Explore all WildpathAfrica safari and travel destinations in ${country.name}. Find tours, experiences, and packages for every traveller.`,
-    alternates: { canonical: `https://wildpathafrica.co.ke/destinations/${country.slug}` },
-    openGraph: {
-      title: `${country.name} Destinations | WildpathAfrica`,
-      url: `https://wildpathafrica.co.ke/destinations/${country.slug}`,
-      siteName: 'WildpathAfrica',
-    },
-  }
+    path: `/destinations/${country.slug}`,
+  });
 }
 
 export default async function CountryDestinationsPage({ params }: Props) {
@@ -49,22 +55,15 @@ export default async function CountryDestinationsPage({ params }: Props) {
 
   if (!country) notFound()
 
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://wildpathafrica.co.ke/' },
-      { '@type': 'ListItem', position: 2, name: 'Destinations', item: 'https://wildpathafrica.co.ke/destinations/' },
-      { '@type': 'ListItem', position: 3, name: country.name, item: `https://wildpathafrica.co.ke/destinations/${country.slug}/` },
-    ],
-  }
-
   const coverUrl = country.coverImage?.fileUrl || "/assets/hero-bg.png";
 
   return (
     <div className="min-h-screen bg-navy">
       <Navbar />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <Breadcrumbs items={[
+        { name: "Destinations", href: "/destinations" },
+        { name: country.name, href: `/destinations/${country.slug}` }
+      ]} />
 
       {/* Hero Banner */}
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
@@ -78,13 +77,6 @@ export default async function CountryDestinationsPage({ params }: Props) {
           <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold font-outfit mb-6">
             {country.flagEmoji} {country.name}
           </h1>
-          <nav className="flex items-center justify-center gap-3 text-sm text-white/60 font-medium">
-            <Link href="/" className="hover:text-accent transition-colors">Home</Link>
-            <span>/</span>
-            <Link href="/destinations" className="hover:text-accent transition-colors">Destinations</Link>
-            <span>/</span>
-            <span className="text-white">{country.name}</span>
-          </nav>
         </div>
       </section>
 
@@ -119,6 +111,3 @@ export default async function CountryDestinationsPage({ params }: Props) {
     </div>
   )
 }
-
-// Add Link import
-import Link from 'next/link'

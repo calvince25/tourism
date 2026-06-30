@@ -61,6 +61,8 @@ export default async function SitemapPage() {
     { name: "Travel Blog", path: "/blog" },
     { name: "FAQ", path: "/faq" },
     { name: "Contact Us", path: "/contact" },
+    { name: "Privacy Policy", path: "/privacy-policy" },
+    { name: "Terms and Conditions", path: "/terms" },
   ];
 
   return (

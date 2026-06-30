@@ -1,19 +1,31 @@
 import type { Metadata } from "next";
 
+/**
+ * Canonical production URL — hardcoded to prevent env-var leaks
+ * from Vercel previews or local development.
+ */
+export const SITE_URL = "https://www.wildpathafrica.co.ke";
+export const SITE_NAME = "WildpathAfrica";
+export const TWITTER_HANDLE = "@wildpathafrica";
+
 export interface SEOMetadataInput {
   title: string;
   description: string;
-  path?: string; // e.g. "/about" or "tours/classic-safari"
+  path?: string;
   ogImage?: string;
   type?: "website" | "article";
+  noIndex?: boolean;
+  publishedTime?: string;
+  modifiedTime?: string;
+  authors?: string[];
 }
 
 /**
- * Standardizes metadata configuration across the entire site.
- * - Enforces title length (50-60 characters) and format: "[Primary Keyword] | GrowthLab Limited"
- * - Enforces description length (140-160 characters)
- * - Computes absolute canonical URLs
- * - Configures Open Graph and Twitter Card tags
+ * Generates consistent, complete metadata for any page.
+ * - Absolute canonical URLs with www
+ * - Open Graph + Twitter Card tags
+ * - Proper brand suffix
+ * - No GrowthLab references
  */
 export function generateSEOMetadata({
   title,
@@ -21,87 +33,100 @@ export function generateSEOMetadata({
   path = "",
   ogImage,
   type = "website",
+  noIndex = false,
+  publishedTime,
+  modifiedTime,
+  authors,
 }: SEOMetadataInput): Metadata {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://wildpathafrica.co.ke";
-  
-  // Standardize trailing slash and format path
+  // Build absolute canonical URL — no double slashes
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  const canonicalUrl = `${siteUrl}${cleanPath}`.replace(/\/$/, ""); // Strip trailing slash for consistency
+  const canonicalUrl = `${SITE_URL}${cleanPath}`.replace(/\/$/, "");
 
-  const defaultOgImage = `${siteUrl}/assets/og-image.jpg`;
-  const finalOgImage = ogImage || defaultOgImage;
+  // Default OG image
+  const defaultOgImage = `${SITE_URL}/assets/og-image.jpg`;
+  const finalOgImage = ogImage
+    ? ogImage.startsWith("http")
+      ? ogImage
+      : `${SITE_URL}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`
+    : defaultOgImage;
 
-  // Title formatting: should be between 50 and 60 chars.
-  const brandSuffix = " | GrowthLab Limited";
+  // Brand suffix
+  const brandSuffix = ` | ${SITE_NAME}`;
   let metaTitle = title.trim();
 
-  // If the title doesn't already contain the brand, append it
-  if (!metaTitle.toLowerCase().includes("growthlab")) {
+  // Append brand if not already present
+  if (!metaTitle.toLowerCase().includes("wildpathafrica") && !metaTitle.toLowerCase().includes("wildpath")) {
     metaTitle = `${metaTitle}${brandSuffix}`;
   }
 
-  // Ensure title is between 50-60 characters
-  if (metaTitle.length < 50) {
-    const filler = " - Expert Safari Tours & Holidays";
-    const potentialTitle = `${title.trim()}${filler}${brandSuffix}`;
-    if (potentialTitle.length >= 50 && potentialTitle.length <= 60) {
-      metaTitle = potentialTitle;
-    } else {
-      // Pad title if it's still too short
-      metaTitle = metaTitle.padEnd(50, " ");
-    }
-  }
+  // Cap title at 60 characters for SEO
   if (metaTitle.length > 60) {
     metaTitle = metaTitle.substring(0, 57) + "...";
   }
 
-  // Description formatting: should be between 140 and 160 chars.
+  // Clean description — cap at 160 characters
   let metaDesc = description.trim();
-  if (metaDesc.length < 140) {
-    const filler = " Experience authentic African travel with GrowthLab Limited's custom-built rental collection, automation systems, and tour platforms.";
-    metaDesc = `${metaDesc}${filler}`.trim();
-  }
   if (metaDesc.length > 160) {
     metaDesc = metaDesc.substring(0, 157) + "...";
-  } else if (metaDesc.length < 140) {
-    metaDesc = metaDesc.padEnd(140, " ");
   }
 
-  return {
+  // If description is too short, extend with relevant brand text
+  if (metaDesc.length < 120) {
+    const filler = " Discover Kenya's finest safari tours, wildlife experiences, and beach holidays with WildpathAfrica.";
+    metaDesc = `${metaDesc}${filler}`.trim();
+    if (metaDesc.length > 160) {
+      metaDesc = metaDesc.substring(0, 157) + "...";
+    }
+  }
+
+  const metadata: Metadata = {
     title: metaTitle,
     description: metaDesc,
-    metadataBase: new URL(siteUrl),
+    metadataBase: new URL(SITE_URL),
     alternates: {
       canonical: canonicalUrl,
     },
+    robots: noIndex
+      ? { index: false, follow: false }
+      : { index: true, follow: true, "max-image-preview": "large" as const, "max-snippet": -1, "max-video-preview": -1 },
     openGraph: {
       title: metaTitle,
       description: metaDesc,
       url: canonicalUrl,
-      siteName: "WildpathAfrica",
+      siteName: SITE_NAME,
       images: [
         {
           url: finalOgImage,
           width: 1200,
           height: 630,
-          alt: metaTitle,
+          alt: title.trim(),
         },
       ],
       locale: "en_US",
-      type,
+      type: type === "article" ? "article" : "website",
+      ...(type === "article" && publishedTime && { publishedTime }),
+      ...(type === "article" && modifiedTime && { modifiedTime }),
+      ...(type === "article" && authors && { authors }),
     },
     twitter: {
       card: "summary_large_image",
       title: metaTitle,
       description: metaDesc,
       images: [finalOgImage],
-      creator: "@GrowthLabLtd",
+      site: TWITTER_HANDLE,
+      creator: TWITTER_HANDLE,
     },
   };
+
+  return metadata;
 }
 
-export function generateBreadcrumbSchema(items: { name: string; item: string }[]) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://wildpathafrica.co.ke";
+/**
+ * Generate BreadcrumbList schema.org structured data.
+ */
+export function generateBreadcrumbSchema(
+  items: { name: string; item: string }[]
+) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -109,12 +134,19 @@ export function generateBreadcrumbSchema(items: { name: string; item: string }[]
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: item.item.startsWith("http") ? item.item : `${siteUrl}${item.item.startsWith("/") ? "" : "/"}${item.item}`,
+      item: item.item.startsWith("http")
+        ? item.item
+        : `${SITE_URL}${item.item.startsWith("/") ? "" : "/"}${item.item}`,
     })),
   };
 }
 
-export function generateFAQSchema(faqs: { question: string; answer: string }[]) {
+/**
+ * Generate FAQPage schema.org structured data.
+ */
+export function generateFAQSchema(
+  faqs: { question: string; answer: string }[]
+) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
