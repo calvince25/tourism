@@ -1,62 +1,138 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
+/**
+ * Canonical production base URL — never use env vars here so Vercel
+ * preview deployments or a misconfigured NEXT_PUBLIC_SITE_URL cannot
+ * accidentally leak a wrong origin into the sitemap.
+ */
+const BASE_URL = 'https://www.wildpathafrica.co.ke'
+
+/** Join base + path without ever producing a double slash. */
+function url(path: string): string {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return `${BASE_URL}${cleanPath}`
+}
+
+/**
+ * Static pages with fixed, meaningful lastModified dates.
+ * Update these dates whenever you ship copy/design changes to the page.
+ */
+const staticPages: MetadataRoute.Sitemap = [
+  {
+    url: url('/'),
+    lastModified: new Date('2026-06-30'),
+    changeFrequency: 'daily',
+    priority: 1.0,
+  },
+  {
+    url: url('/destinations'),
+    lastModified: new Date('2026-06-30'),
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  },
+  {
+    url: url('/tours'),
+    lastModified: new Date('2026-06-30'),
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  },
+  {
+    url: url('/blog'),
+    lastModified: new Date('2026-06-30'),
+    changeFrequency: 'daily',
+    priority: 0.8,
+  },
+  {
+    url: url('/about'),
+    lastModified: new Date('2026-06-15'),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  },
+  {
+    url: url('/contact'),
+    lastModified: new Date('2026-06-15'),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  },
+  {
+    url: url('/faq'),
+    lastModified: new Date('2026-06-15'),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  },
+  {
+    url: url('/sitemap'),
+    lastModified: new Date('2026-06-30'),
+    changeFrequency: 'monthly',
+    priority: 0.5,
+  },
+]
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://wildpathafrica.co.ke'
-
-  const staticPages = [
-    { url: `${base}/`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 1.0 },
-    { url: `${base}/destinations`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${base}/tours`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${base}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${base}/contact`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${base}/blog`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.8 },
-    { url: `${base}/faq`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${base}/sitemap`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
-  ]
-
   try {
-    const destinations = await prisma.destination.findMany({
-      where: { status: 'PUBLISHED' },
-      include: { country: true },
-      orderBy: { updatedAt: 'desc' },
-    })
+    const [destinations, tours, posts, countries] = await Promise.all([
+      prisma.destination.findMany({
+        where: { status: 'PUBLISHED' },
+        select: { slug: true, updatedAt: true, country: { select: { slug: true } } },
+        orderBy: { updatedAt: 'desc' },
+      }),
+      prisma.tour.findMany({
+        where: { status: 'PUBLISHED' },
+        select: { slug: true, updatedAt: true },
+        orderBy: { updatedAt: 'desc' },
+      }),
+      prisma.blogPost.findMany({
+        where: { status: 'PUBLISHED' },
+        select: { slug: true, updatedAt: true },
+        orderBy: { updatedAt: 'desc' },
+      }),
+      prisma.country.findMany({
+        where: { active: true },
+        select: { slug: true, createdAt: true },
+      }),
+    ])
 
-    const tours = await prisma.tour.findMany({ where: { status: 'PUBLISHED' } })
-    const posts = await prisma.blogPost.findMany({ where: { status: 'PUBLISHED' } })
-    const countries = await prisma.country.findMany({ where: { active: true } })
-
-    const countryPages = countries.map(c => ({
-      url: `${base}/destinations/${c.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
+    const countryPages: MetadataRoute.Sitemap = countries.map((c) => ({
+      url: url(`/destinations/${c.slug}`),
+      lastModified: c.createdAt,
+      changeFrequency: 'weekly',
       priority: 0.85,
     }))
 
-    const destinationPages = destinations.map(d => ({
-      url: `${base}/destinations/${d.country.slug}/${d.slug}`,
+    const destinationPages: MetadataRoute.Sitemap = destinations.map((d) => ({
+      url: url(`/destinations/${d.country.slug}/${d.slug}`),
       lastModified: d.updatedAt,
-      changeFrequency: 'weekly' as const,
+      changeFrequency: 'weekly',
       priority: 0.9,
     }))
 
-    const tourPages = tours.map(t => ({
-      url: `${base}/tours/${t.slug}`,
+    const tourPages: MetadataRoute.Sitemap = tours.map((t) => ({
+      url: url(`/tours/${t.slug}`),
       lastModified: t.updatedAt,
-      changeFrequency: 'weekly' as const,
+      changeFrequency: 'weekly',
       priority: 0.85,
     }))
 
-    const blogPages = posts.map(p => ({
-      url: `${base}/blog/${p.slug}`,
+    const blogPages: MetadataRoute.Sitemap = posts.map((p) => ({
+      url: url(`/blog/${p.slug}`),
       lastModified: p.updatedAt,
-      changeFrequency: 'monthly' as const,
+      changeFrequency: 'monthly',
       priority: 0.7,
     }))
 
-    return [...staticPages, ...countryPages, ...destinationPages, ...tourPages, ...blogPages]
+    return [
+      ...staticPages,
+      ...countryPages,
+      ...destinationPages,
+      ...tourPages,
+      ...blogPages,
+    ]
   } catch (error) {
-    console.warn('Sitemap generation database connection not available yet. Using static fallback pages sitemap.')
+    console.warn(
+      'Sitemap: database unavailable — returning static pages only.',
+      error,
+    )
     return staticPages
   }
 }
