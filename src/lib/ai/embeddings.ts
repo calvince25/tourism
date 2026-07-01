@@ -17,10 +17,13 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   const cleanText = text.replace(/\s+/g, " ").trim().slice(0, 8192);
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent?key=${GOOGLE_AI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": GOOGLE_AI_API_KEY,
+      },
       body: JSON.stringify({
         model: `models/${EMBEDDING_MODEL}`,
         content: { parts: [{ text: cleanText }] },

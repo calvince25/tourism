@@ -71,7 +71,7 @@ export async function POST(req: Request) {
 
     // 2. Build conversation history for Gemini
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
       systemInstruction: SYSTEM_PROMPT,
     });
 
