@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Globe, MessageCircle, Mail, Phone, Share2, Upload, X, Loader2 } from "lucide-react";
+import { Save, Globe, MessageCircle, Mail, Phone, Share2, Upload, X, Loader2, Bot, RefreshCw } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { compressImage } from "@/lib/image";
 
@@ -10,6 +10,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<Record<string, "compressing" | "uploading" | "saving" | null>>({});
 
   useEffect(() => {
@@ -148,6 +149,24 @@ export default function SettingsPage() {
     });
   };
 
+  const handleSyncAI = async () => {
+    if (!confirm("This will re-embed all published tours, destinations, FAQs, and blog posts. It may take 1–2 minutes. Continue?")) return;
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/admin/sync-knowledge", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message || "AI knowledge base synced!");
+      } else {
+        toast.error(data.error || "Sync failed");
+      }
+    } catch (e) {
+      toast.error("Sync failed — check server logs.");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   if (loading) return <div className="p-10 animate-pulse text-white/20">Loading settings...</div>;
 
   return (
@@ -155,6 +174,33 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-3xl sm:text-4xl font-bold font-outfit text-white mb-2">General Settings</h1>
         <p className="text-white/40 text-sm">Configure site-wide information and social links.</p>
+      </div>
+
+      {/* AI Knowledge Base Card */}
+      <div className="bg-gradient-to-br from-accent/5 to-transparent border border-accent/20 rounded-3xl p-6 sm:p-8">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center flex-shrink-0">
+            <Bot className="text-accent" size={22} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-white mb-1">Wema AI Knowledge Base</h2>
+            <p className="text-white/40 text-sm mb-4">
+              Wema (your AI travel guide) learns from your published tours, destinations, FAQs, and blog posts.
+              New content syncs automatically. Use this button to force a full re-sync if needed.
+            </p>
+            <button
+              onClick={handleSyncAI}
+              disabled={syncing}
+              className="flex items-center gap-2 px-5 py-2.5 bg-accent text-navy font-bold rounded-xl hover:bg-accent/90 transition-all disabled:opacity-50 text-sm"
+            >
+              {syncing ? (
+                <><Loader2 size={16} className="animate-spin" /> Syncing all content…</>
+              ) : (
+                <><RefreshCw size={16} /> Sync AI Knowledge Base</>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">

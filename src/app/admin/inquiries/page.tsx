@@ -12,6 +12,7 @@ import {
   Tag,
   MapPin,
   BookOpen,
+  Trash2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -83,6 +84,24 @@ export default function InquiriesPage() {
       }
     } catch {
       toast.error("Update failed");
+    }
+  };
+
+  const deleteInquiry = async (id: string, type: string) => {
+    if (!window.confirm("Are you sure you want to delete this inquiry? This cannot be undone.")) return;
+    
+    try {
+      const res = await fetch(`/api/inquiries?id=${id}&type=${type}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setInquiries((prev) => prev.filter((i) => i.id !== id));
+        toast.success("Inquiry deleted successfully");
+      } else {
+        toast.error("Failed to delete inquiry");
+      }
+    } catch {
+      toast.error("Failed to delete inquiry");
     }
   };
 
@@ -295,6 +314,13 @@ export default function InquiriesPage() {
                             <MessageCircle size={16} />
                           </a>
                         )}
+                        <button
+                          onClick={() => deleteInquiry(inq.id, inq.type)}
+                          className="p-2 bg-white/5 rounded-lg text-white/40 hover:text-red-400 hover:bg-red-400/10 transition-all ml-2"
+                          title="Delete Inquiry"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>

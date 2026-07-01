@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { syncDestination, deleteChunks as deleteDestChunks } from '@/lib/ai/knowledgeSync'
+
+async function syncDestBg(id: string) {
+  try { await syncDestination(id); } catch (e) { console.warn('Dest sync error:', e); }
+}
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -38,6 +43,7 @@ export async function POST(req: Request) {
       }
     })
 
+    syncDestBg(destination.id);
     return NextResponse.json(destination)
   } catch (error: any) {
     console.error("API Error:", error)
@@ -85,6 +91,7 @@ export async function PUT(req: Request) {
       }
     })
 
+    syncDestBg(id);
     return NextResponse.json(destination)
   } catch (error: any) {
     console.error("API Error:", error)
@@ -115,6 +122,7 @@ export async function DELETE(req: Request) {
       where: { id }
     })
 
+    deleteDestChunks('destination', id).catch(() => {});
     return NextResponse.json(deletedDestination)
   } catch (error: any) {
     console.error("API Error deleting destination:", error)

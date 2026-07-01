@@ -61,7 +61,24 @@ export default function BookingModal({
       const data = await res.json();
 
       if (res.ok) {
-        toast.success("Inquiry submitted successfully! Our agents will contact you shortly.");
+        toast.success("Inquiry submitted successfully! Redirecting to WhatsApp...");
+        
+        // Construct WhatsApp Message
+        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438";
+        let message = `*New Booking Inquiry*\n`;
+        message += `*Item:* ${itemName}\n`;
+        message += `*Name:* ${formData.name}\n`;
+        message += `*Email:* ${formData.email}\n`;
+        if (formData.phone) message += `*Phone:* ${formData.phone}\n`;
+        if (formData.travelDate) message += `*Travel Date:* ${formData.travelDate}\n`;
+        message += `*Travelers:* ${formData.travelersAdults} Adults, ${formData.travelersChildren} Children\n`;
+        if (formData.budgetRange) message += `*Budget:* ${formData.budgetRange}\n`;
+        message += `*Accommodation:* ${formData.accommodationPref}\n`;
+        if (formData.specialRequirements) message += `*Requirements:* ${formData.specialRequirements}\n`;
+
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
+
         onClose();
         // Reset form
         setFormData({

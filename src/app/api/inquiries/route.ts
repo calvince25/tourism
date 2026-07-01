@@ -179,3 +179,33 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "An internal server error occurred." }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    const type = searchParams.get("type");
+
+    if (!id || !type) {
+      return NextResponse.json({ error: "Missing id or type" }, { status: 400 });
+    }
+
+    if (type === "CONTACT") {
+      await prisma.contactSubmission.delete({
+        where: { id },
+      });
+    } else {
+      await prisma.bookingInquiry.delete({
+        where: { id },
+      });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("DELETE /api/inquiries error:", error);
+    return NextResponse.json({ error: "Deletion failed" }, { status: 500 });
+  }
+}

@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/shared/Footer";
 import WhatsAppButton from "@/components/shared/WhatsAppButton";
+import ChatWidget from "@/components/shared/ChatWidget";
 import { Toaster } from "react-hot-toast";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
@@ -39,6 +40,7 @@ export default function RootLayout({
         {children}
         <Footer />
         <WhatsAppButton />
+        <ChatWidget />
       </body>
     </html>
   );
