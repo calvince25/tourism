@@ -7,6 +7,8 @@
 import { prisma } from "@/lib/prisma";
 import { upsertChunk, deleteChunks } from "./vectorStore";
 
+export { deleteChunks };
+
 // ─── Tours ────────────────────────────────────────────────────────────────────
 
 export async function syncTour(tourId: string): Promise<void> {
