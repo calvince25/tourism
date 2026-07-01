@@ -3,7 +3,7 @@
  * Uses text-embedding-004 (768-dimensional, free tier).
  */
 
-const EMBEDDING_MODEL = "text-embedding-004";
+const EMBEDDING_MODEL = "gemini-embedding-2";
 const GOOGLE_AI_API_KEY = process.env.GOOGLE_AI_API_KEY!;
 
 interface EmbeddingResponse {
@@ -26,6 +26,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
       },
       body: JSON.stringify({
         model: `models/${EMBEDDING_MODEL}`,
+        outputDimensionality: 768,
         content: { parts: [{ text: cleanText }] },
         taskType: "RETRIEVAL_DOCUMENT",
       }),
