@@ -7,6 +7,7 @@ import ChatWidget from "@/components/shared/ChatWidget";
 import { Toaster } from "react-hot-toast";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
+import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
         <Footer />
         <WhatsAppButton />
         <ChatWidget />
+        <Analytics />
       </body>
     </html>
   );
