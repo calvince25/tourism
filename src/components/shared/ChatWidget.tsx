@@ -275,11 +275,11 @@ export default function ChatWidget() {
 
         const processEvent = (event: string) => {
           const line = event
-            .split("\n")
-            .find((value) => value.startsWith("data: "));
+            .split(/\r?\n/)
+            .find((value) => value.startsWith("data:"));
           if (!line) return false;
 
-          const data = line.slice(6).trim();
+          const data = line.slice(5).trim();
           if (data === "[DONE]") return true;
 
           let parsed: { text?: string; tourCards?: TourCard[]; error?: string };
@@ -309,7 +309,7 @@ export default function ChatWidget() {
         while (true) {
           const { done, value } = await reader.read();
           buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
-          const events = buffer.split("\n\n");
+          const events = buffer.split(/\r?\n\r?\n/);
           buffer = events.pop() || "";
 
           for (const event of events) {
