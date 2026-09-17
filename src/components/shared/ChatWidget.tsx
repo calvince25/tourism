@@ -268,42 +268,64 @@ export default function ChatWidget() {
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
+        let buffer = "";
         let accumulatedText = "";
         let tourCards: TourCard[] | undefined;
+        let streamDone = false;
+
+        const processEvent = (event: string) => {
+          const line = event
+            .split("\n")
+            .find((value) => value.startsWith("data: "));
+          if (!line) return false;
+
+          const data = line.slice(6).trim();
+          if (data === "[DONE]") return true;
+
+          let parsed: { text?: string; tourCards?: TourCard[]; error?: string };
+          try {
+            parsed = JSON.parse(data);
+          } catch {
+            // The caller only processes complete SSE events, but ignore any
+            // unexpected server comment or keep-alive frame safely.
+            return false;
+          }
+
+          if (parsed.error) throw new Error(parsed.error);
+          if (parsed.text) {
+            accumulatedText += parsed.text;
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId
+                  ? { ...m, content: accumulatedText, isStreaming: true }
+                  : m
+              )
+            );
+          }
+          if (parsed.tourCards) tourCards = parsed.tourCards;
+          return false;
+        };
 
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
+          buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+          const events = buffer.split("\n\n");
+          buffer = events.pop() || "";
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
-
-          for (const line of lines) {
-            const data = line.slice(6);
-            if (data === "[DONE]") continue;
-
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.text) {
-                accumulatedText += parsed.text;
-                setMessages((prev) =>
-                  prev.map((m) =>
-                    m.id === assistantId
-                      ? { ...m, content: accumulatedText, isStreaming: true }
-                      : m
-                  )
-                );
-              }
-              if (parsed.tourCards) {
-                tourCards = parsed.tourCards;
-              }
-              if (parsed.error) {
-                throw new Error(parsed.error);
-              }
-            } catch {
-              // Skip malformed chunks
+          for (const event of events) {
+            if (processEvent(event)) {
+              streamDone = true;
+              await reader.cancel();
+              buffer = "";
+              break;
             }
           }
+          if (done || streamDone) break;
+        }
+
+        if (buffer.trim()) processEvent(buffer);
+        if (!accumulatedText.trim()) {
+          throw new Error("The chat service returned an empty response.");
         }
 
         // Finalize the message
@@ -315,6 +337,7 @@ export default function ChatWidget() {
           )
         );
       } catch (error) {
+        console.error("Wema chat request failed:", error);
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
