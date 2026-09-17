@@ -43,10 +43,13 @@ export default function Hero({ heroImage = "/assets/hero_bg.png" }: { heroImage?
     <section className="relative min-h-screen w-full flex items-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <div 
-          id="hero-bg-home"
-          className="absolute inset-0 bg-cover bg-center" 
-          style={{ backgroundImage: `url('${heroImage}')` }}
+        <Image
+          src={heroImage}
+          alt="Kenya safari landscape and wildlife"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-navy-deep/50" />
       </div>
@@ -63,13 +66,12 @@ export default function Hero({ heroImage = "/assets/hero_bg.png" }: { heroImage?
             Kenya&apos;s Premier Safari Experience
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-white">
-            Journey to All <br />
-            <span className="text-accent">World Corners</span>
+            Kenya Safari Tours <br />
+            <span className="text-accent">Made for Wonder</span>
           </h1>
           <p className="text-base sm:text-lg text-white/80 mb-8 max-w-md mx-auto lg:mx-0">
-            Unlock the wonders of the world: Your dream trip. 
-            Our tours offer a diverse range of destinations 
-            that cater to a wide variety of interests.
+            Explore expertly guided Kenya safari tours, Masai Mara wildlife,
+            Amboseli landscapes, and unforgettable safari-and-beach holidays.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link

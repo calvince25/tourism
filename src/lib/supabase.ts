@@ -1,15 +1,46 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
+function getSupabaseConfig() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
+  if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+    throw new Error('Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and the Supabase key variables.')
+  }
+  return { supabaseUrl, supabaseAnonKey, supabaseServiceKey }
+}
 
-// Public client (browser-safe)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+let publicClient: SupabaseClient | undefined
+let adminClient: SupabaseClient | undefined
 
-// Admin/server client with elevated privileges
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { persistSession: false }
+export function getSupabaseClient() {
+  if (!publicClient) {
+    const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig()
+    publicClient = createClient(supabaseUrl, supabaseAnonKey)
+  }
+  return publicClient
+}
+
+export function getSupabaseAdmin() {
+  if (!adminClient) {
+    const { supabaseUrl, supabaseServiceKey } = getSupabaseConfig()
+    adminClient = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false }
+    })
+  }
+  return adminClient
+}
+
+// Lazy proxies preserve existing imports without constructing clients during build.
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, property) {
+    return Reflect.get(getSupabaseClient(), property)
+  },
+})
+export const supabaseAdmin = new Proxy({} as SupabaseClient, {
+  get(_target, property) {
+    return Reflect.get(getSupabaseAdmin(), property)
+  },
 })
 
 export const STORAGE_BUCKET = 'media'

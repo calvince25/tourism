@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { searchSimilar } from "@/lib/ai/vectorStore";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
+function getGenerativeAI() {
+  const key = process.env.GOOGLE_AI_API_KEY;
+  if (!key) throw new Error("Google AI is not configured.");
+  return new GoogleGenerativeAI(key);
+}
 
 const SYSTEM_PROMPT = `You are Wema, the AI travel guide for WildpathAfrica — a premier safari and tourism company based in Kenya. 
 
@@ -70,7 +74,7 @@ export async function POST(req: Request) {
     }
 
     // 2. Build conversation history for Gemini
-    const model = genAI.getGenerativeModel({
+    const model = getGenerativeAI().getGenerativeModel({
       model: "gemini-2.5-flash-lite",
       systemInstruction: SYSTEM_PROMPT,
     });

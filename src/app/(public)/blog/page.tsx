@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/blog/BlogCard";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
@@ -81,9 +82,11 @@ export default async function BlogIndexPage() {
               {featuredPost && (
                 <div className="group relative bg-navy-light/10 border border-white/5 rounded-[40px] overflow-hidden flex flex-col lg:flex-row hover:border-accent/30 transition-all duration-500">
                   <div className="lg:w-3/5 relative h-[250px] sm:h-[400px] lg:h-auto overflow-hidden">
-                    <img 
-                      src={featuredPost.featuredImage?.fileUrl || "/assets/placeholder.png"} 
+                    <Image
+                      src={featuredPost.featuredImage?.fileUrl || "/assets/placeholder.png"}
                       alt={featuredPost.title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 60vw"
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>

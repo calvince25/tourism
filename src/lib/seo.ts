@@ -160,3 +160,11 @@ export function generateFAQSchema(
     })),
   };
 }
+
+/** Keep the page template as the sole H1; rich-text editors should begin at H2. */
+export function normalizeRichTextHeadings(html: string | null | undefined): string {
+  if (!html) return "";
+  return html
+    .replace(/<h1(\s[^>]*)?>/gi, "<h2$1>")
+    .replace(/<\/h1>/gi, "</h2>");
+}

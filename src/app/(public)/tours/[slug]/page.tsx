@@ -17,7 +17,7 @@ import {
   Zap
 } from "lucide-react";
 import type { Metadata } from "next";
-import { generateSEOMetadata } from "@/lib/seo";
+import { generateSEOMetadata, normalizeRichTextHeadings } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
 import BookingButton from "@/components/shared/BookingButton";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
@@ -166,7 +166,7 @@ export default async function TourDetailPage({ params }: Props) {
               {/* Overview */}
               <div className="prose prose-invert max-w-none">
                 <h2 className="text-2xl sm:text-4xl font-bold font-outfit text-white mb-6 sm:mb-8 border-l-4 border-accent pl-4 sm:pl-6">Tour Overview</h2>
-                <div className="text-white/70 text-base sm:text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: tour.fullDescription || "" }} />
+                <div className="text-white/70 text-base sm:text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: normalizeRichTextHeadings(tour.fullDescription) }} />
               </div>
 
               {/* Highlights */}
@@ -199,8 +199,8 @@ export default async function TourDetailPage({ params }: Props) {
                           <h4 className="text-2xl font-bold font-outfit mb-4">{day.title}</h4>
                           <div className="flex flex-wrap gap-6 text-xs font-bold uppercase tracking-widest text-white/40 mb-6">
                             <span className="flex items-center gap-2"><MapPin size={14} className="text-accent" /> {day.location}</span>
-                            {day.accommodation && <span className="flex items-center gap-2">🏠 {day.accommodation}</span>}
-                            {day.mealsIncluded && <span className="flex items-center gap-2">🍽️ {day.mealsIncluded}</span>}
+                            {day.accommodation && <span className="flex items-center gap-2">Accommodation: {day.accommodation}</span>}
+                            {day.mealsIncluded && <span className="flex items-center gap-2">Meals: {day.mealsIncluded}</span>}
                           </div>
                           <p className="text-white/60 leading-relaxed mb-6">{day.description}</p>
                           {day.photo && (

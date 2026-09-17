@@ -3,13 +3,20 @@
  * Uses the service-role client to bypass RLS for server-side operations.
  */
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { generateEmbedding } from "./embeddings";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+let supabaseClient: SupabaseClient<any, "public", any> | undefined;
+
+function getVectorStoreClient() {
+  if (!supabaseClient) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) throw new Error("Supabase vector store is not configured.");
+    supabaseClient = createClient(url, key);
+  }
+  return supabaseClient;
+}
 
 export interface KnowledgeChunk {
   id: string;
@@ -29,7 +36,7 @@ export interface SearchResult extends KnowledgeChunk {
 export async function upsertChunk(chunk: KnowledgeChunk): Promise<void> {
   const embedding = await generateEmbedding(chunk.content);
 
-  const { error } = await supabase.from("knowledge_chunks").upsert(
+  const { error } = await getVectorStoreClient().from("knowledge_chunks").upsert(
     {
       id: chunk.id,
       content: chunk.content,
@@ -52,7 +59,7 @@ export async function deleteChunks(
   sourceType: string,
   sourceId: string
 ): Promise<void> {
-  const { error } = await supabase
+  const { error } = await getVectorStoreClient()
     .from("knowledge_chunks")
     .delete()
     .eq("source_type", sourceType)
@@ -71,7 +78,7 @@ export async function searchSimilar(
 ): Promise<SearchResult[]> {
   const embedding = await generateEmbedding(query);
 
-  const { data, error } = await supabase.rpc("match_knowledge", {
+  const { data, error } = await getVectorStoreClient().rpc("match_knowledge", {
     query_embedding: embedding,
     match_count: limit,
     min_similarity: 0.25,

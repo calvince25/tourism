@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import FadeIn from '@/components/animations/FadeIn'
 import { Calendar, MapPin, Clock, Globe, Shield, Zap, TrendingUp } from 'lucide-react'
-import { generateSEOMetadata } from '@/lib/seo'
+import { generateSEOMetadata, normalizeRichTextHeadings } from '@/lib/seo'
 import JsonLd from '@/components/shared/JsonLd'
 import BookingButton from '@/components/shared/BookingButton'
 import Breadcrumbs from '@/components/shared/Breadcrumbs'
@@ -178,7 +178,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                 <h2 className="text-4xl font-bold font-outfit text-white mb-8 border-l-4 border-accent pl-6">Introduction</h2>
                 <div 
                   className="text-white/70"
-                  dangerouslySetInnerHTML={{ __html: dest.contentIntro || "" }}
+                  dangerouslySetInnerHTML={{ __html: normalizeRichTextHeadings(dest.contentIntro) }}
                 />
               </div>
 
@@ -187,7 +187,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                 <h2 className="text-3xl font-bold font-outfit mb-8 text-white">Why Visit {dest.name}?</h2>
                 <div 
                   className="text-white/70"
-                  dangerouslySetInnerHTML={{ __html: dest.contentWhyVisit || "" }}
+                  dangerouslySetInnerHTML={{ __html: normalizeRichTextHeadings(dest.contentWhyVisit) }}
                 />
               </div>
 
@@ -199,7 +199,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                   </h2>
                   <div 
                     className="text-white/70"
-                    dangerouslySetInnerHTML={{ __html: dest.contentWildlife }}
+                    dangerouslySetInnerHTML={{ __html: normalizeRichTextHeadings(dest.contentWildlife) }}
                   />
                 </div>
               )}
@@ -212,7 +212,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                   </h2>
                   <div 
                     className="text-white/70"
-                    dangerouslySetInnerHTML={{ __html: dest.contentCulture }}
+                    dangerouslySetInnerHTML={{ __html: normalizeRichTextHeadings(dest.contentCulture) }}
                   />
                 </div>
               )}
@@ -339,5 +339,4 @@ export default async function DestinationDetailPage({ params }: Props) {
     </div>
   )
 }
-
 

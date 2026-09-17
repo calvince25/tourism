@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, User, Clock, Share2, Facebook, Twitter, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
-import { generateSEOMetadata } from "@/lib/seo";
+import { generateSEOMetadata, normalizeRichTextHeadings } from "@/lib/seo";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import JsonLd from "@/components/shared/JsonLd";
 
@@ -146,7 +146,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
             <div className="lg:col-span-8">
               <div 
                 className="prose prose-invert prose-base sm:prose-lg md:prose-xl max-w-none prose-headings:font-outfit prose-accent prose-p:leading-relaxed prose-p:text-white/70"
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: normalizeRichTextHeadings(post.content) }}
               />
 
               <div className="mt-20 pt-12 border-t border-white/5">

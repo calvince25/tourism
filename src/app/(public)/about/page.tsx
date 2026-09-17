@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
 import { 
   Shield, 
   Zap, 
@@ -187,9 +188,11 @@ export default async function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-5 relative">
               <div className="aspect-[4/5] bg-navy-light/20 rounded-[40px] overflow-hidden border border-white/5 relative group">
-                <img 
-                  src={founderImage} 
+                <Image
+                  src={founderImage}
                   alt="WildpathAfrica Founder Cynthia" 
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 42vw"
                   className="w-full h-full object-cover transition-all duration-700 scale-105 group-hover:scale-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-dark via-transparent to-transparent opacity-80" />

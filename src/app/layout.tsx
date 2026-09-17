@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/shared/Footer";
 import WhatsAppButton from "@/components/shared/WhatsAppButton";
-import ChatWidget from "@/components/shared/ChatWidget";
+const ChatWidget = dynamic(() => import("@/components/shared/ChatWidget"), {
+  ssr: false,
+  loading: () => null,
+});
 import { Toaster } from "react-hot-toast";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
