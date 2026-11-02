@@ -7,7 +7,7 @@ import Link from 'next/link'
 import Breadcrumbs from "@/components/shared/Breadcrumbs"
 import { generateSEOMetadata } from "@/lib/seo"
 
-interface Props { params: { country: string } }
+interface Props { params: Promise<{ country: string }> }
 
 export const revalidate = 3600;
 
@@ -19,9 +19,10 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { country: countrySlug } = await params;
   let country: any = null;
   try {
-    country = await prisma.country.findUnique({ where: { slug: params.country } })
+    country = await prisma.country.findUnique({ where: { slug: countrySlug } })
   } catch (e) {
     console.error("Failed to fetch country metadata:", e);
   }
@@ -36,10 +37,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CountryDestinationsPage({ params }: Props) {
+  const { country: countrySlug } = await params;
   let country: any = null;
   try {
     country = await prisma.country.findUnique({
-      where: { slug: params.country, active: true },
+      where: { slug: countrySlug, active: true },
       include: {
         coverImage: true,
         destinations: {

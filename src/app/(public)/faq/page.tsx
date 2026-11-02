@@ -1,14 +1,16 @@
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { HelpCircle, ChevronDown } from "lucide-react";
 import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: "Frequently Asked Questions",
-  description: "Find answers to common questions about booking safaris, payments, visas, and safety with WildpathAfrica.",
+  title: "Safari & Tour FAQs",
+  description: "Common questions about WildpathAfrica tours, enquiry options, travel planning, and package details.",
   path: "/faq",
 });
 
@@ -101,6 +103,17 @@ export default async function FaqPage() {
             ))}
           </div>
 
+          <div className="mt-12 rounded-2xl border border-white/5 bg-navy-light/10 p-6 sm:p-8">
+            <h2 className="text-xl font-bold font-outfit text-white">Explore tours and destinations</h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/60">
+              Compare published safari itineraries or browse destination pages before sending an enquiry.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-5 text-sm font-bold">
+              <Link href="/tours" className="text-accent hover:underline">Browse safari tours</Link>
+              <Link href="/destinations" className="text-accent hover:underline">Explore destinations</Link>
+            </div>
+          </div>
+
           <div className="mt-20 p-6 sm:p-12 bg-accent/10 border border-accent/20 rounded-[40px] text-center">
             <h3 className="text-xl sm:text-2xl font-bold mb-4">Still have questions?</h3>
             <p className="text-white/60 mb-8 text-sm sm:text-base">
@@ -114,7 +127,8 @@ export default async function FaqPage() {
                 Contact Us
               </a>
               <a 
-                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%20have%20a%20question%20regarding%20your%20safari%20services.`}
+                href={buildWhatsAppHref("Hi WildpathAfrica! I have a question regarding your safari services.")}
+                rel="nofollow noopener noreferrer"
                 className="bg-white/10 text-white font-bold px-10 py-4 rounded-xl hover:bg-white/20 transition-all"
               >
                 WhatsApp Us

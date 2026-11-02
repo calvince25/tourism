@@ -1,29 +1,33 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getContentManagerSession } from "@/lib/authorization";
 
 export async function GET() {
+  if (!(await getContentManagerSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const reviews = await prisma.review.findMany({
       orderBy: { createdAt: "desc" },
-      include: {
-        destination: true,
-        tour: true,
-      },
+      include: { destination: true, tour: true },
     });
     return NextResponse.json(reviews);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch reviews" }, { status: 500 });
   }
 }
 
 export async function PUT(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await getContentManagerSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
+  try {
     const { id, status, featured } = await req.json();
+    if (typeof id !== "string" || !id) {
+      return NextResponse.json({ error: "Review ID is required" }, { status: 400 });
+    }
     const updated = await prisma.review.update({
       where: { id },
       data: {
@@ -32,25 +36,22 @@ export async function PUT(req: Request) {
       },
     });
     return NextResponse.json(updated);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to update review" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: Request) {
+  if (!(await getContentManagerSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const url = new URL(req.url);
-    const id = url.searchParams.get("id");
+    const id = new URL(req.url).searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing Review ID" }, { status: 400 });
-
-    const deleted = await prisma.review.delete({
-      where: { id },
-    });
+    const deleted = await prisma.review.delete({ where: { id } });
     return NextResponse.json({ success: true, deleted });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete review" }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import { generateSEOMetadata } from "@/lib/seo";
 import { MapPin, Compass, BookOpen, Layers, ArrowRight } from "lucide-react";
 
@@ -11,7 +12,47 @@ export const metadata: Metadata = generateSEOMetadata({
   path: "/sitemap",
 });
 
+// Keep the page dynamic but reuse its database payload between requests.
 export const dynamic = "force-dynamic";
+
+const getCachedSitemapData = unstable_cache(
+  async () => {
+    const [heroSetting, countries, tours, posts] = await Promise.all([
+      prisma.setting.findUnique({
+        where: { key: "hero_home" },
+        select: { value: true },
+      }),
+      prisma.country.findMany({
+        where: { active: true },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          flagEmoji: true,
+          destinations: {
+            where: { status: "PUBLISHED" },
+            select: { id: true, slug: true, name: true },
+            orderBy: { name: "asc" },
+          },
+        },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.tour.findMany({
+        where: { status: "PUBLISHED" },
+        select: { id: true, slug: true, name: true },
+        orderBy: { name: "asc" },
+      }),
+      prisma.blogPost.findMany({
+        where: { status: "PUBLISHED" },
+        select: { id: true, slug: true, title: true },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+    return { heroImage: heroSetting?.value || null, countries, tours, posts };
+  },
+  ["human-readable-sitemap-data"],
+  { revalidate: 3600 },
+);
 
 export default async function SitemapPage() {
   let countries: any[] = [];
@@ -20,35 +61,11 @@ export default async function SitemapPage() {
   let heroImage = "/assets/hero_bg.png";
 
   try {
-    // Fetch hero image setting
-    const heroSetting = await prisma.setting.findUnique({
-      where: { key: "hero_home" },
-    });
-    if (heroSetting?.value) {
-      heroImage = heroSetting.value;
-    }
-
-    // Fetch dynamic content
-    [countries, tours, posts] = await Promise.all([
-      prisma.country.findMany({
-        where: { active: true },
-        include: {
-          destinations: {
-            where: { status: "PUBLISHED" },
-            orderBy: { name: "asc" },
-          },
-        },
-        orderBy: { sortOrder: "asc" },
-      }),
-      prisma.tour.findMany({
-        where: { status: "PUBLISHED" },
-        orderBy: { name: "asc" },
-      }),
-      prisma.blogPost.findMany({
-        where: { status: "PUBLISHED" },
-        orderBy: { createdAt: "desc" },
-      }),
-    ]);
+    const sitemapData = await getCachedSitemapData();
+    heroImage = sitemapData.heroImage || heroImage;
+    countries = sitemapData.countries;
+    tours = sitemapData.tours;
+    posts = sitemapData.posts;
   } catch (error) {
     console.error("SitemapPage: Database fetch failed:", error);
   }

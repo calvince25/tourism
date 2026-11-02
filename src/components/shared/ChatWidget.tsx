@@ -386,7 +386,7 @@ export default function ChatWidget() {
 
       {/* Tooltip (when closed) */}
       {!isOpen && (
-        <div className="fixed bottom-[5.5rem] left-6 z-50 pointer-events-none">
+        <div className="hidden sm:block fixed bottom-[5.5rem] left-6 z-50 pointer-events-none">
           <div className="bg-navy border border-white/10 rounded-2xl px-3 py-2 text-xs text-white/70 shadow-xl whitespace-nowrap">
             💬 Ask Wema anything about safaris
           </div>

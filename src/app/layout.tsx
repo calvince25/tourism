@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/shared/Footer";
 import WhatsAppButton from "@/components/shared/WhatsAppButton";
-const ChatWidget = dynamic(() => import("@/components/shared/ChatWidget"), {
-  ssr: false,
-  loading: () => null,
-});
+import ChatWidgetLoader from "@/components/shared/ChatWidgetLoader";
 import { Toaster } from "react-hot-toast";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
@@ -45,7 +41,7 @@ export default function RootLayout({
         {children}
         <Footer />
         <WhatsAppButton />
-        <ChatWidget />
+        <ChatWidgetLoader />
         <Analytics />
       </body>
     </html>

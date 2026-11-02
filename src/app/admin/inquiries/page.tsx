@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
 
 type InquiryItem = {
   type: "BOOKING" | "CONTACT";
@@ -305,7 +306,7 @@ export default function InquiriesPage() {
                         </button>
                         {inq.phone && (
                           <a
-                            href={`https://wa.me/${inq.phone.replace(/[^0-9]/g, "")}`}
+                            href={buildWhatsAppHref("", inq.phone)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 bg-white/5 rounded-lg text-white/40 hover:text-[#25D366] hover:bg-[#25D366]/10 transition-all"

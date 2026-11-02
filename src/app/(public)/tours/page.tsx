@@ -2,10 +2,12 @@ import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, DollarSign, Users, ArrowRight, ShieldCheck, Zap, Heart } from "lucide-react";
+import { Clock, ArrowRight, ShieldCheck, Zap, Heart } from "lucide-react";
+import type { Prisma } from "@prisma/client";
 import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
+import { formatTourPrice } from "@/lib/tour-pricing";
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "Safari Tour Packages | Kenya Wildlife Tours",
@@ -15,8 +17,10 @@ export const metadata: Metadata = generateSEOMetadata({
 
 export const revalidate = 3600;
 
+type PublicTour = Prisma.TourGetPayload<{ include: { coverImage: true } }>;
+
 export default async function ToursIndexPage() {
-  let tours: any[] = [];
+  let tours: PublicTour[] = [];
   try {
     tours = await prisma.tour.findMany({
       where: { status: "PUBLISHED" },
@@ -33,7 +37,7 @@ export default async function ToursIndexPage() {
     const dbPromise = prisma.setting.findUnique({
       where: { key: "hero_tours" }
     });
-    const timeoutPromise = new Promise<any>((_, reject) => 
+    const timeoutPromise = new Promise<null>((_, reject) =>
       setTimeout(() => reject(new Error("Timeout")), 2000)
     );
     const heroSetting = await Promise.race([dbPromise, timeoutPromise]);
@@ -66,29 +70,29 @@ export default async function ToursIndexPage() {
         </div>
       </section>
 
-      {/* Trust Badges */}
+      {/* Planning Notes */}
       <section className="py-10 md:py-12 bg-navy-dark border-b border-white/5">
         <div className="container mx-auto px-4 sm:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10">
             <div className="flex items-center gap-4 justify-center">
               <ShieldCheck className="text-accent shrink-0" size={32} />
               <div className="text-left">
-                <p className="font-bold text-white uppercase tracking-wider text-xs">Safe &amp; Secure</p>
-                <p className="text-white/40 text-[10px]">Fully licensed &amp; insured</p>
+                <p className="font-bold text-white uppercase tracking-wider text-xs">Tour Details</p>
+                <p className="text-white/40 text-[10px]">Review each itinerary and its inclusions.</p>
               </div>
             </div>
             <div className="flex items-center gap-4 justify-center sm:border-x sm:border-white/5">
               <Zap className="text-accent shrink-0" size={32} />
               <div className="text-left">
-                <p className="font-bold text-white uppercase tracking-wider text-xs">Fast Booking</p>
-                <p className="text-white/40 text-[10px]">Instant quote within 24h</p>
+                <p className="font-bold text-white uppercase tracking-wider text-xs">Dates &amp; Pricing</p>
+                <p className="text-white/40 text-[10px]">Ask us to confirm current details.</p>
               </div>
             </div>
             <div className="flex items-center gap-4 justify-center">
               <Heart className="text-accent shrink-0" size={32} />
               <div className="text-left">
-                <p className="font-bold text-white uppercase tracking-wider text-xs">Expert Guides</p>
-                <p className="text-white/40 text-[10px]">Certified KMMG naturalists</p>
+                <p className="font-bold text-white uppercase tracking-wider text-xs">Planning Help</p>
+                <p className="text-white/40 text-[10px]">Contact us with itinerary questions.</p>
               </div>
             </div>
           </div>
@@ -126,9 +130,9 @@ export default async function ToursIndexPage() {
 
                     <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
                       <div>
-                        <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">Starting From</p>
+                        <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">Price</p>
                         <p className="text-2xl font-bold text-white font-outfit">
-                          ${tour.priceUsd?.toLocaleString()}
+                          {formatTourPrice(tour.priceUsd, tour.priceKes) || "Ask for price"}
                         </p>
                       </div>
                       <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-2">

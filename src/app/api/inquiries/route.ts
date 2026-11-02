@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sanitizeInput, validateEmail, verifyTurnstileToken } from "@/lib/security";
+import { getContentManagerSession } from "@/lib/authorization";
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !(await getContentManagerSession(session))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const [bookings, contacts] = await Promise.all([
@@ -70,7 +71,7 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !(await getContentManagerSession(session))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const { id, status, type } = await req.json();
@@ -182,7 +183,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !(await getContentManagerSession(session))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const { searchParams } = new URL(req.url);

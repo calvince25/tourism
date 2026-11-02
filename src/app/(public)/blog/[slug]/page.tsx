@@ -9,7 +9,7 @@ import { generateSEOMetadata, normalizeRichTextHeadings } from "@/lib/seo";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import JsonLd from "@/components/shared/JsonLd";
 
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
 
 export const revalidate = 3600;
 
@@ -21,8 +21,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const post = await prisma.blogPost.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: { ogImage: true, author: true }
   });
   if (!post) return {};
@@ -40,8 +41,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostDetailPage({ params }: Props) {
+  const { slug } = await params;
   const post = await prisma.blogPost.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       featuredImage: true,
       author: { select: { name: true, profilePhoto: true } },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { use, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RichTextEditor from "@/components/admin/RichTextEditor";
@@ -9,12 +9,13 @@ import { toast } from "react-hot-toast";
 import { compressImage } from "@/lib/image";
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditBlogPostPage({ params }: Props) {
+  const { id } = use(params);
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ export default function EditBlogPostPage({ params }: Props) {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`/api/blog?id=${params.id}`);
+        const res = await fetch(`/api/blog?id=${id}`);
         if (res.ok) {
           const post = await res.json();
           if (post) {
@@ -60,7 +61,7 @@ export default function EditBlogPostPage({ params }: Props) {
     };
 
     fetchPost();
-  }, [params.id]);
+  }, [id]);
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -118,7 +119,7 @@ export default function EditBlogPostPage({ params }: Props) {
       const res = await fetch("/api/blog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: params.id, ...formData, featuredImageId }),
+        body: JSON.stringify({ id, ...formData, featuredImageId }),
       });
 
       const data = await res.json();

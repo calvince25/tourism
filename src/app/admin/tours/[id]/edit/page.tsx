@@ -3,16 +3,17 @@ import { notFound } from "next/navigation";
 import TourForm from "@/components/admin/TourForm";
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditTourPage({ params }: Props) {
+  const { id } = await params;
   let tour: any = null;
   try {
     tour = await prisma.tour.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         coverImage: true,
         heroImage: true,

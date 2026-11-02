@@ -2,7 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
-export default function DestinationCard({ destination, countrySlug }: { destination: any; countrySlug: string }) {
+type DestinationCardData = {
+  name: string;
+  slug: string;
+  shortTeaser?: string | null;
+  bestSeason?: string | null;
+  thumbnailImage?: { fileUrl: string } | null;
+};
+
+export default function DestinationCard({ destination, countrySlug }: { destination: DestinationCardData; countrySlug: string }) {
   return (
     <Link 
       href={`/destinations/${countrySlug}/${destination.slug}`}
@@ -16,14 +24,13 @@ export default function DestinationCard({ destination, countrySlug }: { destinat
           className="object-cover group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-navy to-transparent opacity-80" />
-        <div className="absolute top-6 left-6 flex gap-2">
-          {destination.visaRequired && (
-            <span className="bg-accent text-navy text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Visa Required</span>
-          )}
-          <span className="bg-white/10 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
-            {destination.bestSeason || "Year Round"}
-          </span>
-        </div>
+        {destination.bestSeason && (
+          <div className="absolute top-6 left-6 flex gap-2">
+            <span className="bg-white/10 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
+              {destination.bestSeason}
+            </span>
+          </div>
+        )}
       </div>
       
       <div className="p-8 flex-grow flex flex-col justify-between">

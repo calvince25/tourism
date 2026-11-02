@@ -1,75 +1,91 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getContentManagerSession } from "@/lib/authorization";
 
 export async function GET() {
   try {
+    const session = await getContentManagerSession();
     const faqs = await prisma.faq.findMany({
-      orderBy: { sortOrder: "asc" },
+      where: session ? undefined : { status: "ACTIVE" },
+      orderBy: [{ category: "asc" }, { sortOrder: "asc" }],
     });
     return NextResponse.json(faqs);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch FAQs" }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await getContentManagerSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
+  try {
     const { question, answer, category } = await req.json();
+    if (
+      typeof question !== "string" || !question.trim() ||
+      typeof answer !== "string" || !answer.trim() ||
+      typeof category !== "string" || !category.trim()
+    ) {
+      return NextResponse.json({ error: "Question, answer, and category are required" }, { status: 400 });
+    }
+
     const faq = await prisma.faq.create({
       data: {
-        question,
-        answer,
-        category,
+        question: question.trim(),
+        answer: answer.trim(),
+        category: category.trim(),
         sortOrder: 0,
         status: "ACTIVE",
       },
     });
+    revalidatePath("/faq");
     return NextResponse.json(faq);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to create FAQ" }, { status: 500 });
   }
 }
 
 export async function PUT(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await getContentManagerSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
+  try {
     const { id, question, answer, category, status } = await req.json();
+    if (typeof id !== "string" || !id) {
+      return NextResponse.json({ error: "FAQ ID is required" }, { status: 400 });
+    }
+
     const updated = await prisma.faq.update({
       where: { id },
       data: {
-        question,
-        answer,
-        category,
-        status,
+        ...(question !== undefined && { question }),
+        ...(answer !== undefined && { answer }),
+        ...(category !== undefined && { category }),
+        ...(status !== undefined && { status }),
       },
     });
+    revalidatePath("/faq");
     return NextResponse.json(updated);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to update FAQ" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: Request) {
+  if (!(await getContentManagerSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const url = new URL(req.url);
-    const id = url.searchParams.get("id");
+    const id = new URL(req.url).searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing FAQ ID" }, { status: 400 });
-
-    const deleted = await prisma.faq.delete({
-      where: { id },
-    });
+    const deleted = await prisma.faq.delete({ where: { id } });
+    revalidatePath("/faq");
     return NextResponse.json({ success: true, deleted });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete FAQ" }, { status: 500 });
   }
 }

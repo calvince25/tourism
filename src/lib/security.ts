@@ -68,12 +68,16 @@ export async function verifyTurnstileToken(token: string): Promise<boolean> {
   }
 
   try {
-    const secretKey = process.env.TURNSTILE_SECRET_KEY || "1x0000000000000000000000000000000AA"; // Cloudflare Turnstile test secret key
+    const secretKey = process.env.TURNSTILE_SECRET_KEY;
+    if (!secretKey) {
+      console.error("TURNSTILE_SECRET_KEY is not configured.");
+      return false;
+    }
     
     // Fetch client IP if available
     let ip = "";
     try {
-      const headerList = headers();
+      const headerList = await headers();
       ip = headerList.get("x-forwarded-for") || headerList.get("x-real-ip") || "";
     } catch {
       // ignore headers access if outside request context

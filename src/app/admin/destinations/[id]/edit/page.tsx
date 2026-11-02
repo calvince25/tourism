@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import DestinationForm from "@/components/admin/DestinationForm";
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditDestinationPage({ params }: Props) {
+  const { id } = await params;
   let destination: any = null;
   let countries: any[] = [];
 
@@ -19,7 +20,7 @@ export default async function EditDestinationPage({ params }: Props) {
     });
 
     destination = await prisma.destination.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         faqs: true,
         attractions: {

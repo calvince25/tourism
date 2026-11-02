@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, Calendar, Users, DollarSign, Send } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
 import Turnstile from "./Turnstile";
 
 interface BookingModalProps {
@@ -64,7 +65,6 @@ export default function BookingModal({
         toast.success("Inquiry submitted successfully! Redirecting to WhatsApp...");
         
         // Construct WhatsApp Message
-        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438";
         let message = `*New Booking Inquiry*\n`;
         message += `*Item:* ${itemName}\n`;
         message += `*Name:* ${formData.name}\n`;
@@ -76,7 +76,7 @@ export default function BookingModal({
         message += `*Accommodation:* ${formData.accommodationPref}\n`;
         if (formData.specialRequirements) message += `*Requirements:* ${formData.specialRequirements}\n`;
 
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = buildWhatsAppHref(message);
         window.open(whatsappUrl, "_blank");
 
         onClose();

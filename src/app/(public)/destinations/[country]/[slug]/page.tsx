@@ -1,17 +1,29 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import type { Prisma } from '@prisma/client'
 import Navbar from '@/components/Navbar'
 import Image from 'next/image'
-import Link from 'next/link'
 import FadeIn from '@/components/animations/FadeIn'
-import { Calendar, MapPin, Clock, Globe, Shield, Zap, TrendingUp } from 'lucide-react'
+import { Calendar, Globe, Zap, TrendingUp } from 'lucide-react'
 import { generateSEOMetadata, normalizeRichTextHeadings } from '@/lib/seo'
 import JsonLd from '@/components/shared/JsonLd'
 import BookingButton from '@/components/shared/BookingButton'
 import Breadcrumbs from '@/components/shared/Breadcrumbs'
 
-interface Props { params: { country: string; slug: string } }
+interface Props { params: Promise<{ country: string; slug: string }> }
+
+type DestinationMetadata = Prisma.DestinationGetPayload<{ include: { country: true; ogImage: true } }>;
+type DestinationPageData = Prisma.DestinationGetPayload<{
+  include: {
+    country: true;
+    heroImage: true;
+    thumbnailImage: true;
+    gallery: { include: { media: true } };
+    faqs: true;
+    attractions: { include: { photo: true } };
+  };
+}>;
 
 export const revalidate = 3600;
 
@@ -21,15 +33,16 @@ export async function generateStaticParams() {
       where: { status: 'PUBLISHED' }, 
       include: { country: true } 
     });
-    return destinations.map((d: any) => ({ country: d.country.slug, slug: d.slug }));
+    return destinations.map((d) => ({ country: d.country.slug, slug: d.slug }));
   } catch { return []; }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  let destination: any = null;
+  const { slug } = await params;
+  let destination: DestinationMetadata | null = null;
   try {
     destination = await prisma.destination.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
       include: { country: true, ogImage: true }
     })
   } catch (e) {
@@ -46,13 +59,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DestinationDetailPage({ params }: Props) {
-  let dest: any = null;
+  const { country, slug } = await params;
+  let dest: DestinationPageData | null = null;
   try {
     dest = await prisma.destination.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
       include: {
         country: true,
         heroImage: true,
+        thumbnailImage: true,
         gallery: { include: { media: true } },
         faqs: true,
         attractions: { include: { photo: true } },
@@ -62,13 +77,7 @@ export default async function DestinationDetailPage({ params }: Props) {
     console.error("Failed to fetch destination details:", e);
   }
 
-  if (!dest || dest.country.slug !== params.country) notFound()
-
-  const breadcrumbs = [
-    { name: "Home", item: "/" },
-    { name: "Destinations", item: "/destinations" },
-    { name: dest.name, item: `/destinations/${dest.country.slug}/${dest.slug}` },
-  ];
+  if (!dest || dest.country.slug !== country) notFound()
 
   return (
     <div className="min-h-screen bg-navy text-white">
@@ -86,7 +95,7 @@ export default async function DestinationDetailPage({ params }: Props) {
           url: `/destinations/${dest.country.slug}/${dest.slug}`,
           image: dest.heroImage?.fileUrl,
           country: dest.country.name,
-          bestSeason: dest.bestSeason
+          bestSeason: dest.bestSeason ?? undefined
         }} 
       />
       {dest.faqs && dest.faqs.length > 0 && (
@@ -117,18 +126,9 @@ export default async function DestinationDetailPage({ params }: Props) {
             </FadeIn>
             <FadeIn delay={0.2}>
               <div className="flex flex-wrap gap-8">
-                <div className="flex items-center gap-3">
-                  <Calendar className="text-accent" />
-                  <span>Best: {dest.bestSeason}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Globe className="text-accent" />
-                  <span>{dest.language}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="text-accent" />
-                  <span>{dest.currency}</span>
-                </div>
+                {dest.bestSeason && <div className="flex items-center gap-3"><Calendar className="text-accent" /><span>Best: {dest.bestSeason}</span></div>}
+                {dest.language && <div className="flex items-center gap-3"><Globe className="text-accent" /><span>{dest.language}</span></div>}
+                {dest.currency && <div className="flex items-center gap-3"><TrendingUp className="text-accent" /><span>{dest.currency}</span></div>}
               </div>
             </FadeIn>
           </div>
@@ -142,27 +142,28 @@ export default async function DestinationDetailPage({ params }: Props) {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
             <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
               <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Best Time</span>
-              <span className="text-base sm:text-lg font-bold text-accent mt-2">{dest.bestSeason || "All Year"}</span>
+              <span className="text-base sm:text-lg font-bold text-accent mt-2">{dest.bestSeason || "Ask us about seasonal timing"}</span>
             </div>
-            <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+            {dest.language && <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
               <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Language</span>
-              <span className="text-base sm:text-lg font-bold text-white mt-2">{dest.language || "English / Swahili"}</span>
-            </div>
-            <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+              <span className="text-base sm:text-lg font-bold text-white mt-2">{dest.language}</span>
+            </div>}
+            {dest.currency && <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
               <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Currency</span>
-              <span className="text-base sm:text-lg font-bold text-white mt-2">{dest.currency || "KES / USD"}</span>
-            </div>
+              <span className="text-base sm:text-lg font-bold text-white mt-2">{dest.currency}</span>
+            </div>}
             <div className="bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
-              <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Visa Info</span>
-              <span className={`text-base sm:text-lg font-bold mt-2 ${dest.visaRequired ? "text-accent" : "text-green-400"}`}>
-                {dest.visaRequired ? "Required" : "Not Required"}
+              <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Entry Requirements</span>
+              <span className="text-sm font-bold text-white mt-2">
+                Requirements depend on nationality. Check current official guidance.
               </span>
             </div>
             <div className="col-span-2 md:col-span-1 bg-navy-light/20 border border-white/5 p-6 rounded-2xl flex flex-col justify-between">
               <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Park Fees (Res / Non-Res)</span>
               <span className="text-sm font-bold text-white mt-2">
-                {dest.parkEntryResident || "Free"} / {dest.parkEntryNonResident || "Free"}
+                {dest.parkEntryResident?.trim() || "Confirm current rates"} / {dest.parkEntryNonResident?.trim() || "Confirm current rates"}
               </span>
+              <span className="text-[10px] text-white/40 mt-2">Confirm current rates before travel.</span>
             </div>
           </div>
         </div>
@@ -224,7 +225,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                     Attractions & Highlights
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {dest.attractions.map((attr: any) => (
+                    {dest.attractions.map((attr) => (
                       <div key={attr.id} className="bg-navy-light/20 border border-white/5 rounded-3xl overflow-hidden flex flex-col group">
                         {attr.photo?.fileUrl && (
                           <div className="relative aspect-video w-full overflow-hidden bg-navy">
@@ -258,7 +259,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                 <div>
                   <h2 className="text-3xl font-bold font-outfit mb-8 border-l-4 border-accent pl-6 text-white">Destination Gallery</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {dest.gallery.map((item: any, i: number) => (
+                    {dest.gallery.map((item, i) => (
                       <div key={i} className="relative h-64 rounded-2xl overflow-hidden group">
                         <Image
                           src={item.media.fileUrl}
@@ -277,7 +278,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                 <div className="space-y-8">
                   <h2 className="text-3xl font-bold font-outfit border-l-4 border-accent pl-6 text-white">Frequently Asked Questions</h2>
                   <div className="space-y-4">
-                    {dest.faqs.map((faq: any, i: number) => (
+                    {dest.faqs.map((faq, i) => (
                       <details key={i} className="group bg-navy-light/10 border border-white/5 rounded-2xl p-6">
                         <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center group-open:text-accent transition-colors">
                           {faq.question}
@@ -311,17 +312,15 @@ export default async function DestinationDetailPage({ params }: Props) {
                 <div className="space-y-4 mb-10">
                   <div className="flex justify-between text-sm">
                     <span className="text-white/40">Park Entry (Res)</span>
-                    <span>{dest.parkEntryResident}</span>
+                    <span>{dest.parkEntryResident?.trim() || "Confirm current rates"}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-white/40">Park Entry (Non-Res)</span>
-                    <span>{dest.parkEntryNonResident}</span>
+                    <span>{dest.parkEntryNonResident?.trim() || "Confirm current rates"}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/40">Visa Info</span>
-                    <span className={dest.visaRequired ? "text-accent" : "text-green-400"}>
-                      {dest.visaRequired ? "Required" : "Not Required"}
-                    </span>
+                    <span className="text-white/40">Entry requirements</span>
+                    <span className="text-right">Check current rules for your passport</span>
                   </div>
                 </div>
                 <BookingButton
@@ -339,4 +338,3 @@ export default async function DestinationDetailPage({ params }: Props) {
     </div>
   )
 }
-

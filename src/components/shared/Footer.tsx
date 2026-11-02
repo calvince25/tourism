@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Facebook, Instagram, Youtube, MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
 
 const Tiktok = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
   <svg
@@ -178,7 +179,8 @@ export default async function Footer() {
               </li>
             </ul>
             <Link 
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20chat%20about%20your%20safari%20packages.`} 
+              href={buildWhatsAppHref("Hi WildpathAfrica! I'd like to chat about your safari packages.")}
+              rel="nofollow noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-bold text-sm hover:scale-105 transition-transform"
             >
               <MessageCircle size={18} />

@@ -40,7 +40,9 @@ export function generateSEOMetadata({
 }: SEOMetadataInput): Metadata {
   // Build absolute canonical URL — no double slashes
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  const canonicalUrl = `${SITE_URL}${cleanPath}`.replace(/\/$/, "");
+  const canonicalUrl = cleanPath === "/"
+    ? `${SITE_URL}/`
+    : `${SITE_URL}${cleanPath.replace(/\/$/, "")}`;
 
   // Default OG image
   const defaultOgImage = `${SITE_URL}/assets/og-image.jpg`;

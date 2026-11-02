@@ -30,7 +30,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
       <JsonLd type="breadcrumb" data={{ items: schemaItems }} />
       <nav
         aria-label="Breadcrumb"
-        className="container mx-auto px-4 sm:px-8 py-3"
+        className="container mx-auto px-4 sm:px-8 pt-16 sm:pt-20 pb-3"
       >
         <ol className="flex items-center flex-wrap gap-1 text-xs sm:text-sm text-white/50">
           {fullItems.map((item, index) => {

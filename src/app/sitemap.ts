@@ -8,6 +8,8 @@ import { prisma } from '@/lib/prisma'
  */
 const BASE_URL = 'https://www.wildpathafrica.co.ke'
 
+export const revalidate = 3600
+
 /** Join base + path without ever producing a double slash. */
 function url(path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`
@@ -27,7 +29,7 @@ const staticPages: MetadataRoute.Sitemap = [
   },
   {
     url: url('/destinations'),
-    lastModified: new Date('2026-06-30'),
+    lastModified: new Date('2026-11-02'),
     changeFrequency: 'weekly',
     priority: 0.9,
   },
@@ -51,13 +53,13 @@ const staticPages: MetadataRoute.Sitemap = [
   },
   {
     url: url('/contact'),
-    lastModified: new Date('2026-06-15'),
+    lastModified: new Date('2026-11-02'),
     changeFrequency: 'monthly',
     priority: 0.7,
   },
   {
     url: url('/faq'),
-    lastModified: new Date('2026-06-15'),
+    lastModified: new Date('2026-11-02'),
     changeFrequency: 'monthly',
     priority: 0.7,
   },

@@ -22,6 +22,11 @@ export default async function DestinationsIndexPage() {
       where: { active: true },
       include: {
         coverImage: true,
+        destinations: {
+          where: { status: "PUBLISHED" },
+          orderBy: { sortOrder: "asc" },
+          select: { name: true, slug: true },
+        },
         _count: {
           select: { destinations: { where: { status: "PUBLISHED" } } }
         }
@@ -68,6 +73,52 @@ export default async function DestinationsIndexPage() {
           <p className="text-white/60 max-w-2xl mx-auto text-base sm:text-lg">
             Discover breathtaking landscapes, extraordinary wildlife, and vibrant cultures across the continent.
           </p>
+        </div>
+      </section>
+
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4 sm:px-8 max-w-5xl space-y-8">
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-bold font-outfit mb-4">Explore Kenya destinations and African tours</h2>
+            <p className="text-white/70 leading-relaxed">
+              This directory is built from the active country and published destination pages in the WildpathAfrica catalogue. The current Kenya listings include wildlife destinations such as Maasai Mara, Amboseli, Tsavo, and Nairobi National Park; inland places including Lake Naivasha and Hell&apos;s Gate and Lake Nakuru; and coastal destinations such as Mombasa, Diani Beach, and Watamu. Open a destination page for the information available about that specific place.
+            </p>
+            <p className="text-white/70 leading-relaxed mt-4">
+              The published <Link href="/tours" className="text-accent underline underline-offset-4">tour catalogue</Link> also contains itineraries for Tanzania&apos;s Moshi and Arusha, Cape Town in South Africa, and Zanzibar. Those are listed as tour packages; they are not additional active country cards in this directory. Use the tour page to review the route and package-specific details.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-xl sm:text-2xl font-bold font-outfit mb-3">Choosing where to go</h3>
+            <p className="text-white/70 leading-relaxed">
+              Start with the experience you want to explore—wildlife and national parks, lakes and landscapes, a coastal stay, or a named multi-stop itinerary. Then compare the published pages for their destinations and route, and consider your own travel dates, available time, and preferred travel style. There is no single route or package that suits every traveller.
+            </p>
+            <p className="text-white/70 leading-relaxed mt-4">
+              Package details such as dates, prices, inclusions, and exclusions vary by tour. Check the individual itinerary rather than assuming that a detail on one package applies to another. If you are considering a combination of destinations that is not shown as a published tour, use the <Link href="/contact" className="text-accent underline underline-offset-4">contact page</Link> to ask the team about it.
+            </p>
+          </div>
+
+          {countries.some((country: any) => country.destinations.length > 0) && (
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold font-outfit mb-4">Browse individual destination pages</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {countries.flatMap((country: any) => country.destinations.map((destination: { name: string; slug: string }) => (
+                  <Link
+                    key={destination.slug}
+                    href={`/destinations/${country.slug}/${destination.slug}`}
+                    className="rounded-xl border border-white/10 bg-navy-light/10 px-5 py-4 text-white/80 hover:border-accent/50 hover:text-accent transition-colors"
+                  >
+                    {destination.name}
+                  </Link>
+                )))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-4 pt-2">
+            <Link href="/tours" className="bg-accent text-navy font-bold px-7 py-3 rounded-xl hover:scale-105 transition-transform">Browse safari tours</Link>
+            <Link href="/contact" className="bg-white/10 text-white font-bold px-7 py-3 rounded-xl hover:bg-white/20 transition-all">Ask about an itinerary</Link>
+          </div>
         </div>
       </section>
 

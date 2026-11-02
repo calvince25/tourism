@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import JsonLd from "@/components/shared/JsonLd";
 import ContactForm from "@/components/ContactForm";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "Contact Us - Safari Consultants & Guides",
@@ -105,7 +107,8 @@ export default async function ContactPage() {
               <div className="pt-10 border-t border-white/5">
                 <h4 className="font-bold mb-6 uppercase tracking-widest text-xs text-white/40">Chat with a Specialist</h4>
                 <a 
-                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20chat%20about%20planning%20a%20safari.`}
+                  href={buildWhatsAppHref("Hi WildpathAfrica! I'd like to chat about planning a safari.")}
+                  rel="nofollow noopener noreferrer"
                   className="inline-flex items-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-transform"
                 >
                   <MessageCircle size={24} />
@@ -116,6 +119,50 @@ export default async function ContactPage() {
 
             {/* Form Side */}
             <ContactForm />
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-20 md:pb-28">
+        <div className="container mx-auto px-4 sm:px-8 max-w-5xl">
+          <div className="bg-navy-light/10 border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-10 md:p-14 space-y-8">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold font-outfit mb-4">Plan a safari or holiday with WildpathAfrica</h2>
+              <p className="text-white/70 leading-relaxed">
+                WildpathAfrica is based in Nairobi, Kenya. The current published tour catalogue includes Kenya group-joining safaris, self-drive and coast itineraries, plus trips for Tanzania, South Africa, and Zanzibar. The destination directory focuses on published places in Kenya. Browse our <Link href="/tours" className="text-accent underline underline-offset-4">tours</Link> and <Link href="/destinations" className="text-accent underline underline-offset-4">destinations</Link> to compare the options already listed; each package page describes its own route and details.
+              </p>
+              <p className="text-white/70 leading-relaxed mt-4">
+                You can contact us about a safari inquiry, beach holiday, custom itinerary, corporate travel, or another question using the form above. These are enquiry topics, not a confirmation that a particular date, package, or service is available. If you have a specific tour in mind, include its name or page link so the team can understand what you are asking about.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold font-outfit mb-3">Helpful details to include</h3>
+              <p className="text-white/70 leading-relaxed">
+                Only your name, email address, and message are required by the form; the phone field is optional. In your message, you may include the destinations or experiences you are considering, your approximate travel dates, the number of travellers, where you expect to start, and whether you are asking about a published group-joining trip or a private or custom option. These details are suggestions to help explain your request, not booking requirements.
+              </p>
+              <ul className="list-disc pl-6 mt-4 space-y-2 text-white/70 leading-relaxed">
+                <li>For wildlife travel, name a park or safari package you would like to discuss.</li>
+                <li>For a coast or beach holiday, mention the relevant place or tour page.</li>
+                <li>For a custom or corporate enquiry, describe the trip purpose and any known dates.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold font-outfit mb-3">Review package details before you book</h3>
+              <p className="text-white/70 leading-relaxed">
+                Routes, dates, prices, inclusions, and exclusions are specific to each published package and can differ between tours. Review the itinerary page for the trip you are considering and ask the team to clarify anything that is not stated there. An enquiry is a way to request information; please confirm the current package details directly with WildpathAfrica before making travel arrangements.
+              </p>
+              <p className="text-white/70 leading-relaxed mt-4">
+                Prefer to start a conversation directly? Use the phone number, email address, or WhatsApp button shown above. The WhatsApp button opens a pre-filled message for you to review; it is not sent until you choose to send it in WhatsApp.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-4 pt-2">
+              <Link href="/tours" className="bg-accent text-navy font-bold px-7 py-3 rounded-xl hover:scale-105 transition-transform">Browse tours</Link>
+              <Link href="/destinations" className="bg-white/10 text-white font-bold px-7 py-3 rounded-xl hover:bg-white/20 transition-all">Explore destinations</Link>
+              <Link href="/faq" className="bg-white/10 text-white font-bold px-7 py-3 rounded-xl hover:bg-white/20 transition-all">Read FAQs</Link>
+            </div>
           </div>
         </div>
       </section>

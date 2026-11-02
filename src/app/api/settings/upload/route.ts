@@ -4,12 +4,13 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { uploadToStorage, ensureMediaBucket, deleteFromStorage } from '@/lib/supabase'
+import { getContentManagerSession } from '@/lib/authorization'
 
 export async function POST(req: Request) {
   try {
     // Auth check
     const session = await getServerSession(authOptions)
-    if (!session) {
+    if (!session || !(await getContentManagerSession(session))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

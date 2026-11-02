@@ -9,35 +9,49 @@ import {
   MapPin, 
   CheckCircle2, 
   XCircle, 
-  Calendar, 
   MessageCircle, 
   ArrowLeft,
-  ChevronRight,
   ShieldCheck,
   Zap
 } from "lucide-react";
 import type { Metadata } from "next";
+import type { Prisma } from "@prisma/client";
 import { generateSEOMetadata, normalizeRichTextHeadings } from "@/lib/seo";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
 import JsonLd from "@/components/shared/JsonLd";
 import BookingButton from "@/components/shared/BookingButton";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
+import { formatTourPrice } from "@/lib/tour-pricing";
 
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
+
+type TourMetadata = Prisma.TourGetPayload<{ include: { ogImage: true } }>;
+type TourPageData = Prisma.TourGetPayload<{
+  include: {
+    coverImage: true;
+    heroImage: true;
+    itinerary: { orderBy: { dayNumber: "asc" }; include: { photo: true } };
+    destinations: { include: { destination: true } };
+    faqs: true;
+    gallery: { include: { media: true } };
+  };
+}>;
 
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
   try {
     const tours = await prisma.tour.findMany({ where: { status: "PUBLISHED" }, select: { slug: true } });
-    return tours.map((t: any) => ({ slug: t.slug }));
+    return tours.map((t) => ({ slug: t.slug }));
   } catch { return []; }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  let tour: any = null;
+  const { slug } = await params;
+  let tour: TourMetadata | null = null;
   try {
     tour = await prisma.tour.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
       include: { ogImage: true }
     });
   } catch (e) {
@@ -54,10 +68,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TourDetailPage({ params }: Props) {
-  let tour: any = null;
+  const { slug } = await params;
+  let tour: TourPageData | null = null;
   try {
     tour = await prisma.tour.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
       include: {
         coverImage: true,
         heroImage: true,
@@ -73,11 +88,7 @@ export default async function TourDetailPage({ params }: Props) {
 
   if (!tour || tour.status !== "PUBLISHED") notFound();
 
-  const breadcrumbs = [
-    { name: "Home", item: "/" },
-    { name: "Tours", item: "/tours" },
-    { name: tour.name, item: `/tours/${tour.slug}` },
-  ];
+  const formattedPrice = formatTourPrice(tour.priceUsd, tour.priceKes);
 
   return (
     <div className="min-h-screen bg-navy text-white">
@@ -93,10 +104,13 @@ export default async function TourDetailPage({ params }: Props) {
           description: tour.shortDescription || "Safari tour package.", 
           url: `/tours/${tour.slug}`,
           image: tour.coverImage?.fileUrl,
-          priceUsd: tour.priceUsd,
+          priceUsd: typeof tour.priceUsd === "number" && tour.priceUsd > 0 ? tour.priceUsd : undefined,
+          priceKes: typeof tour.priceKes === "number" && tour.priceKes > 0 ? tour.priceKes : undefined,
           durationDays: tour.durationDays,
           difficulty: tour.difficulty,
-          highlights: tour.highlights
+          highlights: Array.isArray(tour.highlights)
+            ? tour.highlights.filter((highlight): highlight is string => typeof highlight === "string")
+            : undefined
         }} 
       />
       {tour.faqs && tour.faqs.length > 0 && (
@@ -189,7 +203,7 @@ export default async function TourDetailPage({ params }: Props) {
                 <div className="space-y-12">
                   <h2 className="text-2xl sm:text-4xl font-bold font-outfit">Detailed Itinerary</h2>
                   <div className="space-y-8 relative before:absolute before:left-6 sm:before:left-8 before:top-4 before:bottom-4 before:w-px before:bg-white/5">
-                    {tour.itinerary.map((day: any) => (
+                    {tour.itinerary.map((day) => (
                       <div key={day.id} className="relative pl-16 sm:pl-24 group">
                         <div className="absolute left-0 top-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-navy-light flex flex-col items-center justify-center border border-white/10 group-hover:border-accent transition-colors z-20">
                           <span className="text-[8px] sm:text-[10px] font-bold uppercase text-white/40 leading-none mb-0.5 sm:mb-1">Day</span>
@@ -219,7 +233,7 @@ export default async function TourDetailPage({ params }: Props) {
                 <div className="space-y-8">
                   <h2 className="text-2xl sm:text-4xl font-bold font-outfit text-white mb-6 sm:mb-8 border-l-4 border-accent pl-4 sm:pl-6">Tour Gallery</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {tour.gallery.map((item: any, i: number) => (
+                    {tour.gallery.map((item, i) => (
                       <div key={i} className="relative h-64 rounded-2xl overflow-hidden group border border-white/5">
                         <Image
                           src={item.media.fileUrl}
@@ -284,7 +298,7 @@ export default async function TourDetailPage({ params }: Props) {
                   <div className="mb-10">
                     <p className="text-white/40 text-sm font-medium mb-1">Safari Tour Price</p>
                     <div className="flex items-end gap-2">
-                      <span className="text-5xl font-bold font-outfit text-white">${tour.priceUsd?.toLocaleString()}</span>
+                      <span className="text-2xl sm:text-4xl font-bold font-outfit text-white">{formattedPrice || "Ask for price"}</span>
                       <span className="text-white/40 text-sm mb-2">/ per person</span>
                     </div>
                   </div>
@@ -298,10 +312,6 @@ export default async function TourDetailPage({ params }: Props) {
                       <span className="text-white/40 text-sm">Difficulty</span>
                       <span className="font-bold text-sm uppercase tracking-wider text-accent">{tour.difficulty}</span>
                     </div>
-                    <div className="flex items-center justify-between py-3 border-b border-white/5">
-                      <span className="text-white/40 text-sm">Best Time</span>
-                      <span className="font-bold text-sm">Year Round</span>
-                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -313,7 +323,8 @@ export default async function TourDetailPage({ params }: Props) {
                       Check Availability
                     </BookingButton>
                     <Link 
-                      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254704059438"}?text=Hi%20WildpathAfrica!%20I%27d%20like%20to%20enquire%20about%20the%20${encodeURIComponent(tour.name)}%20package.`}
+                      href={buildWhatsAppHref(`Hi WildpathAfrica! I'd like to enquire about the ${tour.name} package.`)}
+                      rel="nofollow noopener noreferrer"
                       className="w-full bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#25D366]/20 transition-all"
                     >
                       <MessageCircle size={20} /> Chat with Specialist
@@ -323,10 +334,10 @@ export default async function TourDetailPage({ params }: Props) {
 
                 <div className="bg-navy-light/10 border border-white/5 rounded-3xl p-8">
                   <h4 className="font-bold mb-4 flex items-center gap-2">
-                    <ShieldCheck className="text-accent" size={18} /> Our Guarantee
+                    <ShieldCheck className="text-accent" size={18} /> Before You Book
                   </h4>
                   <p className="text-xs text-white/40 leading-relaxed">
-                    All WildpathAfrica tours include 24/7 on-ground support, expert certified guides, and flexible booking protection.
+                    Package details vary. Please confirm current pricing, dates, availability, and inclusions with our team before booking.
                   </p>
                 </div>
               </div>
