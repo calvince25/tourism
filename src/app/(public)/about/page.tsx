@@ -24,7 +24,7 @@ import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "About Us | Our Story and Values",
-  description: "Learn about WildpathAfrica's mission, values, and our commitment to sustainable tourism and community empowerment in Kenya.",
+  description: "Meet WildpathAfrica's team, a Kenya safari company shaped by local knowledge and responsible tourism. Learn how we plan wildlife and coastal journeys.",
   path: "/about",
 });
 

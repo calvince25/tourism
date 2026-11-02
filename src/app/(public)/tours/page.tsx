@@ -11,7 +11,7 @@ import { formatTourPrice } from "@/lib/tour-pricing";
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "Safari Tour Packages | Kenya Wildlife Tours",
-  description: "Browse our curated selection of safari tour packages in Kenya. From Maasai Mara migrations to Amboseli elephant walks.",
+  description: "Compare Kenya wildlife safari packages, coastal breaks and trips beyond Kenya. Check trip lengths and starting prices, then open a tour for full details.",
   path: "/tours",
 });
 
@@ -65,8 +65,11 @@ export default async function ToursIndexPage() {
           <p className="text-accent uppercase tracking-widest font-bold mb-4 text-xs sm:text-sm">Unforgettable Adventures</p>
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-outfit mb-6">Safari Packages</h1>
           <p className="text-white/60 max-w-2xl mx-auto text-base sm:text-lg">
-            Curated wildlife experiences designed to take you deeper into the heart of Africa.
+            Explore guided Kenya wildlife safaris, coastal holidays and selected trips beyond Kenya. Compare trip lengths and starting prices, then open a tour to review itinerary and package details.
           </p>
+          <Link href="/destinations" className="inline-flex mt-5 text-accent font-bold hover:text-white transition-colors">
+            Browse destinations <ArrowRight size={16} className="ml-2" aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
